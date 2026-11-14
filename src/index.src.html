@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="tr"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Flix Jump</title>
+<style>
+/*FONTS*/
+:root{--navy:#0b2a5c;--navy2:#143a78;--red:#e22511;--yellow:#ffc20e;--cream:#fbf6ea;--ink:#1a1012;--hud:'Baloo',system-ui,sans-serif;--ui:'Baloo',system-ui,'PingFang SC','Noto Sans SC',sans-serif;--disp:'Lucky','Baloo','PingFang SC',sans-serif;color-scheme:dark}
+html,body{margin:0;height:100%;background:#1b1238;overflow:hidden;overscroll-behavior:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none;font-family:var(--ui)}
+#app{position:fixed;inset:0;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+#cv.pix{image-rendering:pixelated;image-rendering:crisp-edges}
+button{font-family:var(--ui);cursor:pointer;-webkit-tap-highlight-color:transparent;color:inherit}
+canvas.ic{width:22px;height:22px;display:inline-block;vertical-align:middle;flex:none}
+/* HUD */
+#hud{position:absolute;inset:0;pointer-events:none;font-family:var(--hud)}
+.top{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 8px);display:flex;align-items:flex-start;gap:8px;padding:0 12px}
+.top img{width:54px;height:auto}
+.sc{display:flex;flex-direction:column;line-height:1}
+.sc b{font-size:28px;color:#fff;-webkit-text-stroke:5px var(--navy);paint-order:stroke fill;font-weight:800}
+.sc i{font-style:normal;font-size:11px;color:var(--yellow);-webkit-text-stroke:3px var(--navy);paint-order:stroke fill;margin-top:3px;font-weight:800}
+.pills{margin-left:auto;display:flex;gap:6px;align-items:center}
+.pill{display:flex;align-items:center;gap:4px;background:rgba(11,42,92,.86);color:#fff;border-radius:16px;padding:3px 10px 3px 5px;font-size:15px;font-weight:800;min-height:26px}
+.rbtn{pointer-events:auto;width:38px;height:38px;border-radius:50%;border:none;background:rgba(11,42,92,.86);color:#fff;display:grid;place-items:center;padding:0}
+.rbtn svg{width:18px;height:18px;fill:currentColor}
+#prog{position:absolute;left:10px;top:calc(env(safe-area-inset-top,0px) + 120px);width:6px;height:36vh;border-radius:6px;background:rgba(11,42,92,.4)}
+#prog .f{position:absolute;left:0;right:0;bottom:0;border-radius:6px;background:var(--yellow)}
+#prog canvas{position:absolute;left:50%;top:-30px;width:26px;height:26px;transform:translateX(-50%)}
+#bossBar{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 84px);width:60%;height:14px;border-radius:8px;background:rgba(11,42,92,.8);overflow:hidden}
+#bossBar .f{height:100%;background:var(--red);width:100%;transition:width .15s}
+#bossBar span{position:absolute;inset:0;text-align:center;font-size:9.5px;line-height:14px;color:#fff;font-weight:800;letter-spacing:.6px}
+.btns{position:absolute;right:calc(env(safe-area-inset-right,0px) + 14px);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);display:flex;flex-direction:column;align-items:center;gap:12px;pointer-events:auto}
+#superB{width:72px;height:72px;border-radius:50%;border:4px solid var(--navy);background:conic-gradient(var(--yellow) var(--ch,0%),#7d7350 0);display:grid;place-items:center;touch-action:none;padding:0;opacity:.75}
+#superB svg{width:34px;height:34px}
+#superB.ready{opacity:1;animation:pulse .8s infinite}
+@keyframes pulse{50%{transform:scale(1.08)}}
+#fireB{width:88px;height:88px;border-radius:50%;border:5px solid var(--navy);background:var(--red);display:grid;place-items:center;touch-action:none;padding:0}
+#fireB.on{transform:scale(.93)}
+#fireB canvas{width:56px;height:62px}
+/* screens */
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:calc(env(safe-area-inset-top,0px) + 14px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 14px) max(16px,env(safe-area-inset-left,0px));box-sizing:border-box;color:#fff;text-align:center;animation:fade .22s ease-out}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}}
+.dim{background:rgba(12,10,36,.55)}
+.solid{background:#101a42}
+.card{background:var(--navy);border-radius:22px;padding:18px;width:min(330px,100%);box-sizing:border-box;display:flex;flex-direction:column;gap:10px;align-items:stretch;border:3px solid var(--yellow);box-shadow:0 8px 0 rgba(0,0,0,.28)}
+h2{margin:0;font-family:var(--disp);font-weight:400;font-size:30px;color:var(--yellow);letter-spacing:.5px;line-height:1.05}
+.big{border:3px solid var(--navy);border-radius:14px;padding:12px 16px;font-size:20px;font-weight:800;color:var(--navy);background:var(--yellow);box-shadow:0 4px 0 var(--navy);display:flex;align-items:center;justify-content:center;gap:8px}
+.big.red{background:var(--red);color:#fff}
+.big.ghost{background:transparent;border-color:rgba(255,255,255,.35);color:#fff;box-shadow:none;font-size:16px;font-weight:700}
+.big:active{transform:translateY(2px);box-shadow:none}
+.big small{display:block;font-size:12px;font-weight:700;opacity:.85}
+.row{display:flex;gap:8px}.row>*{flex:1;min-width:0}
+/* menu */
+#menu{justify-content:flex-end;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 22px)}
+#menu .hd{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:12px;right:12px;display:flex;gap:8px;align-items:center}
+#menu .hd .sp{flex:1}
+#menu .brand{position:absolute;top:13%;left:0;right:0;display:flex;flex-direction:column;align-items:center}
+#menu .logo{width:min(150px,40vw)}
+#menu .title{font-family:var(--disp);font-size:40px;line-height:.9;color:var(--yellow);-webkit-text-stroke:6px var(--navy);paint-order:stroke fill;margin-top:-4px;transform:rotate(-3deg)}
+#menu .acts{width:min(320px,100%);display:flex;flex-direction:column;gap:6px;align-items:center}
+#menu .acts .row{width:100%;gap:6px}
+#menu .acts .big{font-size:13px;padding:8px 2px;border-radius:11px;box-shadow:0 3px 0 var(--navy)}
+.link{background:none;border:none;color:#fff;font-size:13px;font-weight:800;padding:4px 8px;text-shadow:0 1px 0 var(--navy),0 0 6px rgba(11,42,92,.9);text-decoration:underline;text-underline-offset:3px}
+.link:disabled{text-decoration:none;opacity:.6}
+.quip{position:absolute;top:34%;max-width:46%;background:#fffdf4;color:var(--navy);border:3px solid var(--navy);border-radius:14px;padding:7px 10px;font-size:13px;font-weight:800;line-height:1.2;pointer-events:none;box-shadow:0 3px 0 var(--navy);z-index:5}
+.quip.l{left:10px;transform:rotate(-3deg);animation:quipL 3.4s ease both}.quip.r{right:10px;transform:rotate(3deg);animation:quipR 3.4s ease both}
+.quip.fin{top:26%;left:50%;right:auto;max-width:76%;font-size:16px;text-align:center;background:var(--yellow);animation:quipF 5.2s ease both}
+@keyframes quipL{0%{opacity:0;translate:-120% 0}9%,86%{opacity:1;translate:0 0}100%{opacity:0;translate:-120% 0}}
+@keyframes quipR{0%{opacity:0;translate:120% 0}9%,86%{opacity:1;translate:0 0}100%{opacity:0;translate:120% 0}}
+@keyframes quipF{0%{opacity:0;transform:translateX(-50%) scale(.6)}8%,88%{opacity:1;transform:translateX(-50%) scale(1)}100%{opacity:0;transform:translateX(-50%) scale(1)}}
+#tiltNote{font-size:12px;font-weight:700;opacity:.85;margin:-2px 0 6px;line-height:1.3}
+/* lists */
+.hdr{display:flex;align-items:center;gap:8px;width:100%;max-width:520px}
+.hdr h2{flex:1;text-align:left;font-size:26px}
+.tabs{display:flex;gap:5px;width:100%;max-width:520px}
+.tabs button{flex:1;border:none;border-radius:12px;padding:9px 2px;font-size:14px;font-weight:800;background:rgba(255,255,255,.1);color:#fff;min-width:0}
+.tabs button.on{background:var(--yellow);color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;width:100%;max-width:520px;overflow-y:auto;padding-bottom:20px;touch-action:pan-y;flex:1;min-height:0;align-content:start;-webkit-overflow-scrolling:touch}
+.grid.one{grid-template-columns:1fr}
+.it{background:var(--navy);border:3px solid transparent;border-radius:16px;padding:8px;display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.it.sel{border-color:var(--yellow)}
+.it.lock{opacity:.7}
+.it canvas.pv{width:100%;aspect-ratio:3/4;border-radius:10px;background:#2a2050;display:block}
+.it .nm{font-weight:800;font-size:15px;line-height:1.15}
+.it .tag{font-size:11.5px;color:#b9c6f2;min-height:14px;line-height:1.2}
+.it button{border:none;border-radius:10px;padding:8px 6px;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;gap:4px}
+.b-buy{background:var(--yellow);color:var(--navy)}.b-iap{background:var(--red);color:#fff}.b-use{background:#2fa84f;color:#fff}.b-on{background:rgba(255,255,255,.14);color:#fff}
+.it button:disabled{opacity:.5}
+.pk{flex-direction:row;align-items:center;gap:10px;padding:10px 12px}
+.pk canvas.pi{width:48px;height:48px;flex:none}
+.pk .pt{flex:1;text-align:left;min-width:0}
+.badge{display:inline-block;font-size:10.5px;background:var(--red);border-radius:6px;padding:1px 6px;margin-left:6px;font-weight:800;vertical-align:middle}
+/* level list */
+.lv{display:flex;align-items:center;gap:12px;background:var(--navy);border-radius:16px;padding:10px 12px;border:none;text-align:left;color:#fff;width:100%}
+.lv .no{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--disp);font-size:22px;flex:none;color:var(--navy);background:var(--yellow)}
+.lv.boss .no{background:var(--red);color:#fff}
+.lv.locked{opacity:.55}.lv.locked .no{background:#51608f;color:#fff}
+.lv .tx{flex:1;min-width:0}.lv .tx b{display:block;font-size:16px;line-height:1.15}.lv .tx span{font-size:12px;color:#b9c6f2}
+.lv .st{font-weight:800;font-size:14px;display:flex;align-items:center;gap:4px;color:var(--yellow)}
+.lv .st svg{width:20px;height:20px;fill:#2fd26a}
+.lv.cur{outline:3px solid var(--yellow)}
+.world{font-family:var(--disp);font-size:15px;color:#b9c6f2;text-align:left;letter-spacing:1px;padding:6px 4px 0}
+.stat{display:flex;justify-content:space-between;align-items:center;font-size:17px;font-weight:700;padding:2px 4px}
+.stat b{color:var(--yellow);display:flex;align-items:center;gap:5px}
+.set{display:flex;flex-direction:column;gap:6px;text-align:left;font-weight:700;font-size:14px;color:#b9c6f2}
+.seg{display:flex;gap:5px}.seg button{flex:1;border:none;border-radius:10px;padding:8px 2px;font-weight:800;font-size:13px;background:rgba(255,255,255,.1);color:#fff;min-width:0}
+.seg button.on{background:var(--yellow);color:var(--navy)}
+/* how to */
+.how{display:flex;align-items:center;gap:12px;text-align:left}
+.how canvas{width:92px;height:92px;border-radius:16px;background:var(--navy2);flex:none}
+.how b{display:block;font-size:17px;line-height:1.2;color:#fff}.how span{font-size:13.5px;color:#b9c6f2;line-height:1.3;display:block;margin-top:3px}
+/* transitions */
+#iris{position:absolute;inset:0;pointer-events:none;z-index:8}
+#intro{visibility:hidden;position:absolute;left:0;right:0;top:30%;display:flex;flex-direction:column;align-items:center;pointer-events:none;z-index:7}
+#intro .a{font-family:var(--disp);font-size:20px;color:#fff;background:var(--red);padding:4px 16px;border-radius:12px;transform:rotate(-2deg)}
+#intro .b{font-family:var(--disp);font-size:40px;line-height:1;color:var(--yellow);-webkit-text-stroke:8px var(--navy);paint-order:stroke fill;margin-top:8px;padding:0 14px;text-align:center}
+#intro.go{visibility:visible}
+#intro.go .a{animation:inL 2.2s cubic-bezier(.2,.9,.2,1) both}#intro.go .b{animation:inR 2.2s cubic-bezier(.2,.9,.2,1) both}
+@keyframes inL{0%{transform:translateX(-110vw) rotate(-2deg)}18%,78%{transform:translateX(0) rotate(-2deg);opacity:1}100%{transform:translateX(0) rotate(-2deg) scale(.9);opacity:0}}
+@keyframes inR{0%{transform:translateX(110vw)}22%,78%{transform:translateX(0);opacity:1}100%{transform:scale(.9);opacity:0}}
+.note{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 130px);transform:translateX(-50%);background:var(--navy);color:#fff;font-weight:700;font-size:14px;padding:8px 14px;border-radius:14px;max-width:62vw;text-align:center;pointer-events:none;z-index:6;animation:fade .3s}
+.toast{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);font-family:var(--disp);font-size:30px;color:var(--yellow);-webkit-text-stroke:7px var(--navy);paint-order:stroke fill;pointer-events:none;white-space:nowrap;animation:tin 1.7s forwards;z-index:6}
+@keyframes tin{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}25%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0}}
+#modal,#ad{z-index:9}
+#ad .card{align-items:center}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){#superB.ready,.scr{animation:none}}
+
+/* ---- 1.3 paper UI: cream paper, navy ink, sticker buttons ---- */
+#playB{width:96px;height:96px;border-radius:50%;background:var(--yellow);border:5px solid var(--navy);box-shadow:0 7px 0 var(--navy);display:grid;place-items:center;padding:0 0 0 6px;animation:pbob 1.8s ease-in-out infinite}
+#playB svg{width:52px;height:52px;fill:var(--navy)}
+#playB:active{transform:translateY(4px);box-shadow:0 3px 0 var(--navy);animation:none}
+@keyframes pbob{50%{transform:scale(1.06)}}
+.plabel{display:flex;flex-direction:column;align-items:center;margin:4px 0 8px}
+.plabel b{font-family:var(--disp);font-weight:400;font-size:24px;letter-spacing:1px;color:#fff;-webkit-text-stroke:6px var(--navy);paint-order:stroke fill;line-height:1}
+.plabel small{font-size:12px;font-weight:800;color:#fff;text-shadow:0 1px 0 var(--navy),0 0 6px rgba(11,42,92,.95);margin-top:3px}
+.dock{display:flex;gap:12px;justify-content:center}
+.dk{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;color:#fff;font-size:11px;font-weight:800;text-shadow:0 1px 0 var(--navy),0 0 6px rgba(11,42,92,.95);padding:0;width:66px}
+.dk svg{width:48px;height:48px;padding:11px;box-sizing:border-box;border-radius:50%;background:#f7f0dd;border:3px solid var(--navy);box-shadow:0 3px 0 var(--navy);fill:none;stroke:var(--navy);stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.dk:active svg{transform:translateY(2px);box-shadow:0 1px 0 var(--navy)}
+.dk:disabled{opacity:.5}
+.solid{background:radial-gradient(circle at 15% 8%,rgba(226,37,17,.07),transparent 42%),radial-gradient(circle at 88% 92%,rgba(11,42,92,.09),transparent 46%),#f7f0dd;color:var(--navy)}
+.card{background:#f7f0dd;color:var(--navy);border:3px solid var(--navy);box-shadow:0 7px 0 rgba(11,42,92,.95);border-radius:16px}
+.solid h2,.card h2{color:var(--red)}
+.card .big.ghost,.solid .big.ghost{color:var(--navy);border-color:var(--navy)}
+#overSub{color:#6a7697!important}
+.tabs{gap:4px;border-bottom:3px solid var(--navy);padding:0 2px;box-sizing:border-box}
+.tabs button{background:none;color:var(--navy);border-radius:10px 10px 0 0;font-size:13px;padding:8px 2px}
+.tabs button.on{background:var(--navy);color:#fff}
+.it{background:#fffdf6;border:2.5px solid var(--navy);border-radius:14px;color:var(--navy);box-shadow:0 3px 0 rgba(11,42,92,.22);padding:7px}
+.it.sel{border-color:var(--red);box-shadow:0 0 0 3px var(--yellow)}
+.it .tag{color:#6a7697}
+.it .nm{font-size:14px}
+.it canvas.pv{aspect-ratio:1/1;border:2px solid var(--navy);box-sizing:border-box;border-radius:9px}
+.it button{border:2px solid var(--navy);border-radius:9px;padding:6px}
+.b-on{background:#e9e1cb;color:var(--navy)}
+.pk{box-shadow:0 3px 0 rgba(11,42,92,.22)}
+.lv{background:#fffdf6;color:var(--navy);border:2.5px solid var(--navy);border-radius:14px;padding:8px 12px}
+.lv .tx span{color:#6a7697}.lv .st{color:var(--navy)}.lv.locked .no{background:#b9b3a0}
+.lv .no{border:2.5px solid var(--navy);box-sizing:border-box}
+.lv.cur{outline:none;box-shadow:0 0 0 3px var(--yellow)}
+.world{color:var(--red)}.world small{display:block;font-family:var(--ui);font-size:12px;color:#6a7697;letter-spacing:0;font-weight:700}
+.stat b{color:var(--red)}
+.set{color:#6a7697}
+.seg button{background:#fffdf6;color:var(--navy);border:2px solid var(--navy)}
+.seg button.on{background:var(--yellow);color:var(--navy)}
+.how b{color:var(--navy)}.how span{color:#6a7697}
+.mprice{font-family:var(--disp);font-size:34px;color:var(--navy);display:flex;align-items:center;justify-content:center;gap:6px;margin:2px 0 6px}
+.mprice canvas.ic{width:34px;height:34px}.mprice.iap{color:var(--red)}
+#mB small{color:#6a7697}
+/* calmer in-game text */
+.quip{top:17%;max-width:40%;background:none;border:none;box-shadow:none;padding:0;color:#fff;font-size:12px;font-weight:700;font-style:italic;line-height:1.25;text-shadow:0 1px 2px rgba(11,42,92,.95),0 0 8px rgba(11,42,92,.7)}
+.quip.l{left:12px;transform:none;text-align:left;animation:quipS 4.6s ease both}.quip.r{right:12px;transform:none;text-align:right;animation:quipS 4.6s ease both}
+.quip.fin{top:15%;left:12px;right:12px;max-width:none;font-size:14px;text-align:center;background:none;animation:quipS 6s ease both}
+@keyframes quipS{0%{opacity:0}14%,80%{opacity:.78}100%{opacity:0}}
+#intro{top:15%}#intro .a{font-size:13px;padding:2px 10px;border-radius:9px}#intro .b{font-size:24px;-webkit-text-stroke:5px var(--navy);margin-top:5px}
+.toast{top:24%;font-size:20px;-webkit-text-stroke:5px var(--navy)}
+.note{font-size:12px;padding:5px 11px;background:rgba(11,42,92,.8);bottom:calc(env(safe-area-inset-bottom,0px) + 104px)}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="cv"></canvas>
+  <div id="hud" hidden>
+    <div class="top">
+      <img id="hudLogo" alt="FLIX">
+      <div class="sc"><b id="score">0</b><i id="best"></i></div>
+      <div class="pills">
+        <div class="pill"><canvas class="ic ic-coin" width="44" height="44"></canvas><span id="hCoin">0</span></div>
+        <div class="pill"><canvas class="ic ic-tuy" width="44" height="44"></canvas><span id="hTuy">0</span></div>
+        <button class="rbtn" id="pauseB" aria-label="Pause"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="5" height="16" rx="1.5"/><rect x="14" y="4" width="5" height="16" rx="1.5"/></svg></button>
+      </div>
+    </div>
+    <div id="prog"><div class="f" id="progF"></div><canvas id="progIc" width="52" height="52"></canvas></div>
+    <div id="bossBar" hidden><div class="f" id="bossF"></div><span id="bossN"></span></div>
+    <div class="btns">
+      <button id="superB" aria-label="Super"><svg viewBox="0 0 24 24"><path d="M14 1 4 14h7l-3 9 12-14h-7z" fill="#0b2a5c"/></svg></button>
+    </div>
+  </div>
+
+  <div class="scr" id="menu">
+    <div class="hd">
+      <button class="rbtn" id="setB" hidden aria-label="Settings"><svg viewBox="0 0 24 24"><path d="M4 7h8M18 7h2M4 12h2M12 12h8M4 17h9M19 17h1" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/><circle cx="15" cy="7" r="2.6"/><circle cx="9" cy="12" r="2.6"/><circle cx="16" cy="17" r="2.6"/></svg></button>
+      <button class="rbtn" id="howB" aria-label="How to play" style="font-family:var(--disp);font-size:20px">?</button>
+      <span class="sp"></span>
+      <div class="pill"><canvas class="ic ic-coin" width="44" height="44"></canvas><span class="wCoin">0</span></div>
+      <div class="pill"><canvas class="ic ic-tuy" width="44" height="44"></canvas><span class="wTuy">0</span></div>
+    </div>
+    <div class="brand"><img class="logo" id="menuLogo" alt="FLIX"><div class="title">JUMP</div></div>
+    <div class="acts">
+      <button id="playB" aria-label="Play"><svg viewBox="0 0 24 24"><path d="M8.5 4.8v14.4a1 1 0 0 0 1.5.86l11.6-7.2a1 1 0 0 0 0-1.72L10 3.94a1 1 0 0 0-1.5.86z"/></svg></button>
+      <div class="plabel"><b id="playT"></b><small id="playSub"></small></div>
+      <div class="dock">
+        <button class="dk" id="lvB"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg><span data-t="levels"></span></button>
+        <button class="dk" id="shopB"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1.2 11.5a1 1 0 0 1-1 .9H7.2a1 1 0 0 1-1-.9zM9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span data-t="shop"></span></button>
+        <button class="dk" id="endB"><svg viewBox="0 0 24 24"><path d="M12 12c-1.6-2.2-3-3.5-5-3.5a3.5 3.5 0 0 0 0 7c2 0 3.400-1.300 5-3.500zm0 0c1.600 2.200 3 3.500 5 3.500a3.500 3.500 0 0 0 0-7c-2 0-3.400 1.300-5 3.500z"/></svg><span id="endT"></span></button>
+        <button class="dk" id="setB2"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span data-t="settings"></span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="scr solid" id="lvls" hidden>
+    <div class="hdr"><h2 data-t="levels"></h2><div class="pill"><canvas class="ic ic-tuy" width="44" height="44"></canvas><span class="wTuy">0</span></div></div>
+    <div class="grid one" id="lvGrid"></div>
+    <button class="big ghost" id="lvBack" style="width:100%;max-width:520px" data-t="back"></button>
+  </div>
+
+  <div class="scr dim" id="pause" hidden>
+    <div class="card"><h2 data-t="paused"></h2>
+      <button class="big red" id="resB" data-t="resume"></button>
+      <button class="big" id="rstB" data-t="restart"></button>
+      <button class="big ghost" id="pSetB" data-t="settings"></button>
+      <button class="big ghost" id="pMenuB" data-t="menu"></button>
+    </div>
+  </div>
+
+  <div class="scr dim" id="over" hidden>
+    <div class="card"><h2 id="overT"></h2><div id="overSub" style="font-size:13px;color:#b9c6f2;margin-top:-6px"></div>
+      <div class="stat"><span data-t="score"></span><b id="oScore">0</b></div>
+      <div class="stat"><span data-t="best"></span><b id="oBest">0</b></div>
+      <div class="stat"><span data-t="coinsWon"></span><b><canvas class="ic ic-coin" width="44" height="44"></canvas><span id="oCoin">0</span></b></div>
+      <div class="stat"><span data-t="tuyWon"></span><b><canvas class="ic ic-tuy" width="44" height="44"></canvas><span id="oTuy">0</span></b></div>
+      <button class="big ghost" id="adB"></button>
+      <button class="big red" id="mainB"></button>
+      <div class="row"><button class="big" id="againB" data-t="again"></button><button class="big ghost" id="oMenuB" data-t="menu"></button></div>
+    </div>
+  </div>
+
+  <div class="scr solid" id="shop" hidden>
+    <div class="hdr"><h2 data-t="shop"></h2><div class="pill"><canvas class="ic ic-coin" width="44" height="44"></canvas><span class="wCoin">0</span></div><div class="pill"><canvas class="ic ic-tuy" width="44" height="44"></canvas><span class="wTuy">0</span></div></div>
+    <div class="tabs"><button data-tab="skin" class="on" data-t="chars"></button><button data-tab="vil" data-t="villains"></button><button data-tab="theme" data-t="themes"></button><button data-tab="pack" data-t="packs"></button></div>
+    <div class="grid" id="shopGrid"></div>
+    <button class="big ghost" id="shopBack" style="width:100%;max-width:520px" data-t="back"></button>
+  </div>
+
+  <div class="scr dim" id="settings" hidden>
+    <div class="card"><h2 data-t="settings"></h2>
+      <div class="set"><span data-t="sound"></span><div class="seg" id="segSnd"><button data-v="0" data-t="on"></button><button data-v="1" data-t="off"></button></div></div>
+      <div class="set"><span data-t="control"></span><div class="seg" id="segCtl"><button data-v="tilt" data-t="tilt"></button><button data-v="drag" data-t="drag"></button><button data-v="side" data-t="side"></button></div></div>
+      <div id="tiltNote" hidden></div>
+      <div class="set"><span data-t="language"></span><div class="seg" id="segLang"><button data-v="tr">Türkçe</button><button data-v="en">English</button><button data-v="es">Español</button><button data-v="zh">中文</button></div></div>
+      <div class="row"><button class="big ghost" data-flixlegal="legal" data-t="legal"></button><button class="big ghost" data-flixlegal="about" data-t="about"></button></div>
+      <button class="big" id="setBack" data-t="back"></button>
+    </div>
+  </div>
+
+  <div class="scr solid" id="how" hidden>
+    <h2 data-t="howto"></h2>
+    <div class="card" style="gap:14px">
+      <div class="how"><canvas id="how1" width="184" height="184"></canvas><div><b id="h1t"></b><span data-t="h1b"></span></div></div>
+      <div class="how"><canvas id="how2" width="184" height="184"></canvas><div><b data-t="h2"></b><span data-t="h2b"></span></div></div>
+      <div class="how"><canvas id="how3" width="184" height="184"></canvas><div><b data-t="h3"></b><span data-t="h3b"></span></div></div>
+      <button class="big red" id="howOk" data-t="gotIt"></button>
+    </div>
+  </div>
+
+  <div class="scr dim" id="modal" hidden>
+    <div class="card"><h2 id="mT"></h2><div id="mB" style="font-size:15px;line-height:1.4"></div>
+      <div class="row"><button class="big ghost" id="mNo" data-t="cancel"></button><button class="big red" id="mOk" data-t="ok"></button></div>
+    </div>
+  </div>
+  <div class="scr solid" id="ad" hidden><div class="card"><img id="adLogo" alt="FLIX" style="width:150px"><div data-t="adTest" style="font-weight:800"></div><div id="adN" style="font-family:var(--disp);font-size:40px;color:var(--yellow)">3</div></div></div>
+  <div id="intro"><div class="a" id="introA"></div><div class="b" id="introB"></div></div>
+  <div id="iris" hidden></div>
+</div>
+<script>/*LOGO*/</script>
+<script>/*AUDIO*/</script>
+<script>/*LEGAL*/</script>
+<script>/*THEME_BASE*/</script>
+<script>/*LEVELS*/</script>
+<script>/*THEME*/</script>
+<script>/*GAME*/</script>
+</body></html>

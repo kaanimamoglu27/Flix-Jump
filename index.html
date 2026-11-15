@@ -639,7 +639,7 @@ const STYLES={
    P:P({sky:['#f4efe2','#f4efe2','#f4efe2','#d8d0bc'],city1:'#a8a294',city2:'#141018',win:'#efe6d2',win2:'#efe6d2',moon:'#ffffff',star:'#141018',
      red:'#ffffff',red2:'#141018',navy:'#141018',yellow:'#ffffff',blue:'#141018',green:'#9a958c',white:'#ffffff',bone:'#ffffff',purple:'#141018',gold:'#ffffff',
      zomb:'#b8b2a4',hood:'#3c3740',glass:'#141018',pink:'#ffffff',cyan:'#ffffff',frame:'#2a2630',ink:'#141018'})},
- gameboy:{label:'GAME BOY',pix:156,quant:'lum',pal:['#0f380f','#306230','#8bac0f','#9bbc0f'],dither:0.55,ol:3.2,mode:'flat',font:'PS',
+ gameboy:{label:'POCKET',pix:156,quant:'lum',pal:['#0f380f','#306230','#8bac0f','#9bbc0f'],dither:0.55,ol:3.2,mode:'flat',font:'PS',
    P:P({sky:['#c8d890','#c8d890','#b8cc78','#98b058'],city1:'#708848',city2:'#304820',win:'#c8d890',win2:'#c8d890',moon:'#e8f0c0',star:'#304820',
      red:'#506838',red2:'#6a8448',navy:'#102810',yellow:'#c8d890',blue:'#3a5428',green:'#88a050',white:'#f0f8d0',bone:'#f0f8d0',purple:'#304820',gold:'#b0c870',
      zomb:'#a0b868',hood:'#304820',glass:'#102810',pink:'#e8f0c0',cyan:'#f0f8d0',frame:'#304820',ink:'#0a200a'})},
@@ -1104,7 +1104,7 @@ const STR={
   ['Mayın Tarlası','Minefield','Campo Minado','雷区'],['Minik Adımlar','Tiny Steps','Pasos Diminutos','小小台阶'],['Hız Kulesi','Speed Tower','Torre Veloz','极速塔'],['Kaos','Chaos','Caos','混乱'],['Vorteks\'in Ekranı','Vorteks\' Screen','La Pantalla de Vorteks','沃特克斯的屏幕']],
  skin:{kraliyet:['Kraliyet FLIX','Royal FLIX','FLIX Real','皇家FLIX'],buzul:['Buzul FLIX','Ice FLIX','FLIX de Hielo','冰霜FLIX'],ejder:['Ejder FLIX','Dragon FLIX','FLIX Dragón','龙FLIX'],altin:['Altın FLIX','Golden FLIX','FLIX Dorado','黄金FLIX'],neon:['Neon FLIX','Neon FLIX','FLIX Neón','霓虹FLIX'],golge:['Gölge FLIX','Shadow FLIX','FLIX Sombra','暗影FLIX'],parti:['Parti FLIX','Party FLIX','FLIX Fiesta','派对FLIX'],korsan:['Korsan FLIX','Pirate FLIX','FLIX Pirata','海盗FLIX'],karpuz:['Karpuz FLIX','Watermelon FLIX','FLIX Sandía','西瓜FLIX'],dj:['DJ FLIX','DJ FLIX','DJ FLIX','DJ FLIX'],noel:['Kış FLIX','Winter FLIX','FLIX Invierno','冬日FLIX'],astronot:['Astronot FLIX','Astronaut FLIX','FLIX Astronauta','宇航员FLIX'],ninja:['Ninja FLIX','Ninja FLIX','FLIX Ninja','忍者FLIX'],kral:['Kral FLIX','King FLIX','FLIX Rey','国王FLIX'],
   v_zombi:['Telefon Zombisi','Phone Zombie','Zombi del Móvil','手机僵尸'],v_kral:['İskelet Kral','Skeleton King','Rey Esqueleto','骷髅王'],v_ejder:['Kemik Ejderha','Bone Dragon','Dragón de Hueso','骨龙'],v_dev:['Dev Zombi','Giant Zombie','Zombi Gigante','巨型僵尸'],v_vorteks:['Vorteks','Vorteks','Vorteks','沃特克斯']},
- theme:{water:['Sulu Boya','Watercolor','Acuarela','水彩'],clay:['Claymation','Claymation','Plastilina','黏土'],cel:['Cel-Shaded','Cel-Shaded','Cel-Shaded','卡通渲染'],b32:['32-bit Piksel','32-bit Pixel','Píxel 32 bits','32位像素'],orig:['Orijinal Piksel','Original Pixel','Píxel Original','原创像素'],nes:['8-bit','8-bit','8 bits','8位'],gameboy:['Game Boy','Game Boy','Game Boy','Game Boy'],onebit:['1-bit','1-bit','1 bit','1位'],dark:['Dark Fantasy','Dark Fantasy','Fantasía Oscura','黑暗幻想']},
+ theme:{water:['Sulu Boya','Watercolor','Acuarela','水彩'],clay:['Hamur','Clay','Plastilina','黏土'],cel:['Cel-Shaded','Cel-Shaded','Cel-Shaded','卡通渲染'],b32:['32-bit Piksel','32-bit Pixel','Píxel 32 bits','32位像素'],orig:['Orijinal Piksel','Original Pixel','Píxel Original','原创像素'],nes:['8-bit','8-bit','8 bits','8位'],gameboy:['Cep Konsolu','Pocket Console','Consola de Bolsillo','掌机'],onebit:['1-bit','1-bit','1 bit','1位'],dark:['Dark Fantasy','Dark Fantasy','Fantasía Oscura','黑暗幻想']},
 };
 </script>
 <script>// ---------- FLIX Zıpla: tema motoru (9 görsel stil, sprite önbelleği)
@@ -1157,12 +1157,12 @@ const VILLAIN_ORDER=['v_zombi','v_kral','v_ejder','v_dev','v_vorteks'];
 const VDRAW={zombie:[()=>phoneZombie(0,0),1.0,40],king:[()=>skeletonKing(0,0),.62,2],dragon:[()=>dragon(0,0),.44,4],golem:[()=>golem(0,0),.5,8],vorteks:[()=>vorteks(0,0),.58,2]};
 const THEMES={
   water:{style:'water',name:'Sulu Boya',price:0,iap:null},
-  clay:{style:'clay',name:'Claymation',price:900,iap:'49,99 ₺'},
+  clay:{style:'clay',name:'Hamur',price:900,iap:'49,99 ₺'},
   cel:{style:'cel',name:'Cel-Shaded',price:900,iap:'49,99 ₺'},
   b32:{style:'b32',name:'32-bit Piksel',price:1200,iap:'59,99 ₺'},
   orig:{style:'orig',name:'Orijinal Piksel',price:1200,iap:'59,99 ₺'},
   nes:{style:'nes',name:'8-bit',price:1500,iap:'69,99 ₺'},
-  gameboy:{style:'gameboy',name:'Game Boy',price:1500,iap:'69,99 ₺'},
+  gameboy:{style:'gameboy',name:'Cep Konsolu',price:1500,iap:'69,99 ₺'},
   onebit:{style:'onebit',name:'1-bit',price:1800,iap:'79,99 ₺'},
   dark:{style:'dark',name:'Dark Fantasy',price:2500,iap:'99,99 ₺'},
 };

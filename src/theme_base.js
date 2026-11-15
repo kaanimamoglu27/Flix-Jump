@@ -23,7 +23,7 @@ const STYLES={
    P:P({sky:['#f4efe2','#f4efe2','#f4efe2','#d8d0bc'],city1:'#a8a294',city2:'#141018',win:'#efe6d2',win2:'#efe6d2',moon:'#ffffff',star:'#141018',
      red:'#ffffff',red2:'#141018',navy:'#141018',yellow:'#ffffff',blue:'#141018',green:'#9a958c',white:'#ffffff',bone:'#ffffff',purple:'#141018',gold:'#ffffff',
      zomb:'#b8b2a4',hood:'#3c3740',glass:'#141018',pink:'#ffffff',cyan:'#ffffff',frame:'#2a2630',ink:'#141018'})},
- gameboy:{label:'GAME BOY',pix:156,quant:'lum',pal:['#0f380f','#306230','#8bac0f','#9bbc0f'],dither:0.55,ol:3.2,mode:'flat',font:'PS',
+ gameboy:{label:'POCKET',pix:156,quant:'lum',pal:['#0f380f','#306230','#8bac0f','#9bbc0f'],dither:0.55,ol:3.2,mode:'flat',font:'PS',
    P:P({sky:['#c8d890','#c8d890','#b8cc78','#98b058'],city1:'#708848',city2:'#304820',win:'#c8d890',win2:'#c8d890',moon:'#e8f0c0',star:'#304820',
      red:'#506838',red2:'#6a8448',navy:'#102810',yellow:'#c8d890',blue:'#3a5428',green:'#88a050',white:'#f0f8d0',bone:'#f0f8d0',purple:'#304820',gold:'#b0c870',
      zomb:'#a0b868',hood:'#304820',glass:'#102810',pink:'#e8f0c0',cyan:'#f0f8d0',frame:'#304820',ink:'#0a200a'})},

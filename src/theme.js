@@ -48,12 +48,12 @@ const VILLAIN_ORDER=['v_zombi','v_kral','v_ejder','v_dev','v_vorteks'];
 const VDRAW={zombie:[()=>phoneZombie(0,0),1.0,40],king:[()=>skeletonKing(0,0),.62,2],dragon:[()=>dragon(0,0),.44,4],golem:[()=>golem(0,0),.5,8],vorteks:[()=>vorteks(0,0),.58,2]};
 const THEMES={
   water:{style:'water',name:'Sulu Boya',price:0,iap:null},
-  clay:{style:'clay',name:'Claymation',price:900,iap:'49,99 ₺'},
+  clay:{style:'clay',name:'Hamur',price:900,iap:'49,99 ₺'},
   cel:{style:'cel',name:'Cel-Shaded',price:900,iap:'49,99 ₺'},
   b32:{style:'b32',name:'32-bit Piksel',price:1200,iap:'59,99 ₺'},
   orig:{style:'orig',name:'Orijinal Piksel',price:1200,iap:'59,99 ₺'},
   nes:{style:'nes',name:'8-bit',price:1500,iap:'69,99 ₺'},
-  gameboy:{style:'gameboy',name:'Game Boy',price:1500,iap:'69,99 ₺'},
+  gameboy:{style:'gameboy',name:'Cep Konsolu',price:1500,iap:'69,99 ₺'},
   onebit:{style:'onebit',name:'1-bit',price:1800,iap:'79,99 ₺'},
   dark:{style:'dark',name:'Dark Fantasy',price:2500,iap:'99,99 ₺'},
 };

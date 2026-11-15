@@ -10,10 +10,10 @@ window.FLIX_ADS_CONFIG = {
   forceTestAds: false,
   ids: {
     // App id, form ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX (with ~). tools/ios_setup.py puts it into Info.plist (GADApplicationIdentifier).
-    IOS_APP_ID: '',
+    IOS_APP_ID: 'ca-app-pub-9939733946730095~8566034422',
     // Ad unit ids, form ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX (with /)
-    IOS_REWARDED: '',
-    IOS_INTERSTITIAL: '',
+    IOS_REWARDED: 'ca-app-pub-9939733946730095/3036320239',
+    IOS_INTERSTITIAL: 'ca-app-pub-9939733946730095/4956081578',
     IOS_BANNER: '',
     ANDROID_REWARDED: '',
     ANDROID_INTERSTITIAL: '',

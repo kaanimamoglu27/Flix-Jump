@@ -572,4 +572,4 @@ Sfx.setMuted(save.muted);if(save.noads&&window.FlixAds)FlixAds.setAdsRemoved(tru
 if(window.FlixNative&&FlixNative.flush)try{FlixNative.flush();}catch(e){}
 if(!THEMES[save.theme]||!save.themes.includes(save.theme))save.theme='water';
 if(!SKINS[save.skin])save.skin='kraliyet';
-document.fonts.ready.then(()=>{mode='menu';LV=LEVELS[curLevel()-1];setTheme(save.theme);resetWorld();applyLang();show('#menu');requestAnimationFrame(frame);});
+Promise.all(['Baloo','Lucky','PS','Cinzel'].map(f=>document.fonts.load(`20px ${f}`,'AaĞğŞşİıÇçÖöÜü').catch(()=>{}))).then(()=>document.fonts.ready).then(()=>{mode='menu';LV=LEVELS[curLevel()-1];setTheme(save.theme);resetWorld();applyLang();show('#menu');requestAnimationFrame(frame);});

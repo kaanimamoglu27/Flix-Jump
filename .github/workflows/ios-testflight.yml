@@ -50,13 +50,14 @@ jobs:
       - name: Configure the iOS project
         env:
           APP_VERSION: ${{ inputs.version }}
-          BUILD_NUMBER: ${{ github.run_number }}
           # Optional overrides for the AdMob ids in app/www/ads-config.js
           ADMOB_APP_ID: ${{ secrets.JUMP_ADMOB_APP_ID }}
           ADMOB_REWARDED_ID: ${{ secrets.JUMP_ADMOB_REWARDED_ID }}
           ADMOB_INTERSTITIAL_ID: ${{ secrets.JUMP_ADMOB_INTERSTITIAL_ID }}
           ADMOB_BANNER_ID: ${{ secrets.JUMP_ADMOB_BANNER_ID }}
-        run: python3 tools/ios_setup.py
+        # Build numbers start at 100 here: 1.3 (15) was uploaded earlier from the flix-kick-up repo's workflow,
+        # and App Store Connect only accepts higher numbers for the same version.
+        run: BUILD_NUMBER=$((100 + GITHUB_RUN_NUMBER)) python3 tools/ios_setup.py
       - name: App Store Connect key
         env:
           ASC_KEY_P8: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
@@ -170,4 +171,4 @@ jobs:
             echo "::error::Export failed. See 'Signing diagnostics' above and the Xcode distribution log."
             exit 1
           fi
-          echo "Uploaded Flix Jump build ${{ github.run_number }} (version ${{ inputs.version }}). It appears in App Store Connect > TestFlight after Apple processes it."
+          echo "Uploaded Flix Jump build $((100 + GITHUB_RUN_NUMBER)) (version ${{ inputs.version }}). It appears in App Store Connect > TestFlight after Apple processes it."

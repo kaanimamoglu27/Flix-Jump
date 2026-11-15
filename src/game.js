@@ -2,7 +2,7 @@
    Zıplama fiziği, platform üretimi, kamera ve ses motoru Nova Hop'tan uyarlandı
    (github.com/nikhilrana2715/Doodle-Jump-website-Game, ISC License, © 2025-2026 Nikhil Rana). */
 'use strict';
-const VERSION='1.3.2';
+const VERSION='1.3.3';
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 const rand=(a,b)=>a+Math.random()*(b-a),chance=p=>Math.random()<p,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t;
 const GRAV=0.42,JUMP=-11.6,SPRING_V=-19.5,MAX_FALL=15,GW=390;
@@ -453,11 +453,15 @@ function renderLevels(){wallet();const g=$('#lvGrid');g.innerHTML='';
   drawIcons();const c=g.querySelector('.cur');if(c)c.scrollIntoView({block:'center'});}
 // ---------- ads
 const Ads={
-  lastI:Date.now(),lastR:0,  // interstitial: every 3rd run, at most once per 90 s, never in the first 90 s or right after a rewarded ad
+  // v1.3.3 (Kaan: "Jump'ta reklamlar çalışmıyor"): interstitial came only every 3rd run after 90 s, so a tester almost never saw one,
+  // and a rewarded ad with no fill did nothing. Now: interstitial every 2nd finished run, at most once per 60 s (never in the
+  // first 45 s or within 60 s of a rewarded ad); a rewarded button with no AdMob ad ready shows the FLIX toy ad and still rewards.
+  lastI:Date.now()-15000,lastR:0,
+  house(res){const a=$('#ad');a.hidden=false;let n=3;$('#adN').textContent=n;const iv=setInterval(()=>{n--;$('#adN').textContent=n;if(n<=0){clearInterval(iv);a.hidden=true;res(true);}},700);},
   rewarded(){return new Promise(res=>{
-    if(window.FlixAds){FlixAds.showRewarded(6000).then(r=>{Ads.lastR=Date.now();res(r==='rewarded');});return;}
-    const a=$('#ad');a.hidden=false;let n=3;$('#adN').textContent=n;const iv=setInterval(()=>{n--;$('#adN').textContent=n;if(n<=0){clearInterval(iv);a.hidden=true;res(true);}},700);});},
-  maybeInterstitial(){if(save.noads||!window.FlixAds)return;const now=Date.now();if(save.runs%3!==0||now-Ads.lastI<90000||now-Ads.lastR<90000)return;Ads.lastI=now;FlixAds.showInterstitial();},
+    if(window.FlixAds){FlixAds.showRewarded(6000).then(r=>{Ads.lastR=Date.now();if(r==='unavailable')Ads.house(res);else res(r==='rewarded');});return;}
+    Ads.house(res);});},
+  maybeInterstitial(){if(save.noads||!window.FlixAds)return;const now=Date.now();if(save.runs%2!==0||now-Ads.lastI<60000||now-Ads.lastR<60000)return;Ads.lastI=now;FlixAds.showInterstitial();},
 };
 // ---------- shop
 let shopTab='skin';

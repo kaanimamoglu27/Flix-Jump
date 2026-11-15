@@ -80,7 +80,15 @@ if oc.exists():
     print('online server:', (m and m.group(1)) or 'none (online play hidden in the app)')
 pbx = ios / 'App.xcodeproj' / 'project.pbxproj'
 s = pbx.read_text()
-s = s.replace('TARGETED_DEVICE_FAMILY = "1,2";', 'TARGETED_DEVICE_FAMILY = 1;')
+# Capacitor regenerates the Xcode project for each CI build. Set every target's device family to iPhone only,
+# whether Xcode writes the value quoted or not, and fail the build if any iPad family is left (Apple then reviews
+# on iPad as an iPad app: FLIX Kick Up was rejected for this, Guideline 4).
+s, device_family_count = re.subn(r'TARGETED_DEVICE_FAMILY\s*=\s*(?:"[^"]*"|[^;]*);', 'TARGETED_DEVICE_FAMILY = 1;', s)
+if device_family_count == 0:
+    raise RuntimeError('No TARGETED_DEVICE_FAMILY build setting found in project.pbxproj')
+if any(v.strip().strip('"') != '1' for v in re.findall(r'TARGETED_DEVICE_FAMILY\s*=\s*([^;]+);', s)):
+    raise RuntimeError('iPhone-only device family validation failed')
+print('Validated iPhone-only TARGETED_DEVICE_FAMILY for', device_family_count, 'Xcode build configurations')
 if os.environ.get('BUILD_NUMBER'): s = re.sub(r'CURRENT_PROJECT_VERSION = [^;]+;', 'CURRENT_PROJECT_VERSION = %s;' % os.environ['BUILD_NUMBER'], s)
 if os.environ.get('APP_VERSION'): s = re.sub(r'MARKETING_VERSION = [^;]+;', 'MARKETING_VERSION = %s;' % os.environ['APP_VERSION'], s)
 pbx.write_text(s)

@@ -422,7 +422,7 @@ $('#pauseB').onclick=pauseGame;$('#pMenuB').onclick=toMenu;$('#oMenuB').onclick=
 $('#endB').onclick=()=>{if(save.done>=5)goEndless();};
 $('#shopB').onclick=()=>openShop();$('#shopBack').onclick=()=>{refreshMenu();show('#menu');};
 let setFrom='#menu';function openSet(from){setFrom=from;updSet();tiltNote();show('#settings');}
-$('#setB2').onclick=()=>openSet('#menu');$('#pSetB').onclick=()=>openSet('#pause');$('#setBack').onclick=()=>show(setFrom);
+$('#setB2').onclick=()=>openSet('#menu');$('#pSetB').onclick=()=>openSet('#pause');$('#setBack').onclick=()=>show(setFrom);$('#restoreB2').onclick=restorePurchases;
 function tiltNote(){const n=$('#tiltNote');if(save.ctl!=='tilt'){n.hidden=true;return;}n.hidden=false;n.textContent=t('tiltChk');setTimeout(()=>{n.textContent=t(tiltSeen?'tiltOk':'tiltNo');},900);}
 $('#lvB').onclick=()=>{renderLevels();show('#lvls');};$('#lvBack').onclick=()=>{refreshMenu();show('#menu');};
 function seg(id,cur,fn){$$(id+' button').forEach(b=>{b.classList.toggle('on',b.dataset.v===String(cur));b.onclick=()=>{fn(b.dataset.v);persist();updSet();};});}
@@ -476,8 +476,11 @@ function confirmBox(title,body,ok){$('#mT').textContent=title;$('#mB').innerHTML
 const GRANTS={};
 function grantIAP(id){const g=GRANTS[id];if(g){g();persist();wallet();if(!$('#shop').hidden)renderShop();Sfx.unlock();}}
 window.__flixGrant=(id,tx)=>{if(tx){if(save.tx.includes(tx))return true;save.tx.push(tx);if(save.tx.length>80)save.tx.shift();}grantIAP(id);return true;};
+// App Store price in the player's own currency once the store has loaded; the built-in TL label until then / on the web
+function iapPrice(id,fallback){const p=window.FlixNative&&FlixNative.price&&FlixNative.price(id);return p||fallback;}
+window.addEventListener('flixprices',()=>{if(!$('#shop').hidden)renderShop();});
 function buyIAP(id,label,price){
-  if(window.FlixNative&&FlixNative.buy){FlixNative.buy(id);return;}
+  if(window.FlixNative&&FlixNative.buy){FlixNative.buy(id).then(r=>{if(r==='pending')confirmBox(label,t('buyPending'),null);});return;}
   confirmBox(label,`<div class="mprice iap">${price}</div><small>${t('testBuy')}</small>`,()=>grantIAP(id));
 }
 function spend(cur,amt,label,ok){const have=cur==='tuy'?save.tuy:save.coins,cn=t(cur==='tuy'?'tuy':'coin');
@@ -494,6 +497,13 @@ function enPreview(c,id){const T=TH,x=c.getContext('2d'),w=c.width,h=c.height;x.
   const bl=(s,px,py,sc)=>{x.drawImage(s.c,px-s.ox*sc,py-s.oy*sc,s.w*sc,s.h*sc);};
   bl(T.enSpr('bat',id),w*.5,h*.26,.95);bl(T.getPlat('n',88),w*.14,h*.86,.95);bl(T.enSpr('zombie',id),w*.34,h*.86,1.05);bl(T.enSpr('ghost',id),w*.72,h*.66,1.05);}
 function priceBtn(cls,amt,cur){const b=document.createElement('button');b.className=cls;b.innerHTML=`${amt} <canvas class="ic ic-${cur==='tuy'?'tuy':'coin'}" width="44" height="44"></canvas>`;return b;}
+// "Restore purchases" (App Store requirement for non-consumables): Packs tab and Settings
+function restorePurchases(){
+  if(!(window.FlixNative&&FlixNative.restore)){confirmBox(t('restore'),t('restoreNone'),null);return;}
+  $$('#restoreB,#restoreB2').forEach(b=>b.disabled=true);
+  FlixNative.restore().then(ids=>{confirmBox(t('restore'),t(ids&&ids.length?'restoreOk':'restoreNone'),null);},()=>confirmBox(t('restore'),t('restoreFail'),null))
+    .finally(()=>{$$('#restoreB,#restoreB2').forEach(b=>b.disabled=false);if(!$('#shop').hidden)renderShop();});
+}
 function renderShop(){
   const g=$('#shopGrid');g.innerHTML='';g.classList.toggle('one',shopTab==='pack');
   if(shopTab==='skin'||shopTab==='vil'){
@@ -506,7 +516,7 @@ function renderShop(){
       else if(own){bt=document.createElement('button');bt.textContent=t('use');bt.className='b-use';bt.onclick=()=>{save.skin=id;persist();renderShop();};}
       else{bt=priceBtn('b-buy',s.price,s.cur);bt.disabled=!!locked;bt.onclick=()=>spend(s.cur,s.price,skinName(id),()=>{save.skins.push(id);save.skin=id;});}
       d.appendChild(bt);
-      if(!own&&s.iap&&!locked){GRANTS[s.iapId]=()=>{if(!save.skins.includes(id))save.skins.push(id);save.skin=id;};const b2=document.createElement('button');b2.className='b-iap';b2.textContent=s.iap;b2.onclick=()=>buyIAP(s.iapId,skinName(id),s.iap);d.appendChild(b2);}
+      if(!own&&s.iap&&!locked){GRANTS[s.iapId]=()=>{if(!save.skins.includes(id))save.skins.push(id);save.skin=id;};const b2=document.createElement('button');b2.className='b-iap';b2.textContent=iapPrice(s.iapId,s.iap);b2.onclick=()=>buyIAP(s.iapId,skinName(id),iapPrice(s.iapId,s.iap));d.appendChild(b2);}
       g.appendChild(d);const c=d.querySelector('canvas.pv');setTimeout(()=>previewInto(c,save.theme,id),0);}
     if(shopTab==='vil'){
       const hd=document.createElement('div');hd.className='world';hd.style.gridColumn='1/-1';hd.innerHTML=t('enTitle')+'<small>'+t('enNote')+'</small>';g.appendChild(hd);
@@ -529,7 +539,7 @@ function renderShop(){
       else if(own){bt=document.createElement('button');bt.textContent=t('use');bt.className='b-use';bt.onclick=()=>{save.theme=id;persist();setTheme(id);renderShop();};}
       else{bt=priceBtn('b-buy',th.price,'tuy');bt.onclick=()=>spend('tuy',th.price,themeName(id),()=>{save.themes.push(id);save.theme=id;setTheme(id);});}
       d.appendChild(bt);
-      if(!own&&th.iap){const pid='jump_theme_'+id;GRANTS[pid]=()=>{if(!save.themes.includes(id))save.themes.push(id);save.theme=id;setTheme(id);};const b2=document.createElement('button');b2.className='b-iap';b2.textContent=th.iap;b2.onclick=()=>buyIAP(pid,themeName(id),th.iap);d.appendChild(b2);}
+      if(!own&&th.iap){const pid='jump_theme_'+id;GRANTS[pid]=()=>{if(!save.themes.includes(id))save.themes.push(id);save.theme=id;setTheme(id);};const b2=document.createElement('button');b2.className='b-iap';b2.textContent=iapPrice(pid,th.iap);b2.onclick=()=>buyIAP(pid,themeName(id),iapPrice(pid,th.iap));d.appendChild(b2);}
       g.appendChild(d);q.push([d.querySelector('canvas.pv'),id]);}
     const next=()=>{const it=q.shift();if(!it||$('#shop').hidden||shopTab!=='theme')return;previewInto(it[0],it[1],save.skin);setTimeout(next,10);};setTimeout(next,30);
   }else{
@@ -537,7 +547,7 @@ function renderShop(){
       const own=(p.give.noads&&save.noads)||(p.give.themes&&save.themes.length>=9);
       d.innerHTML=`<canvas class="pi" width="96" height="96"></canvas><div class="pt"><div class="nm">${t(p.name)}${p.best?`<span class="badge">${t('bestSeller')}</span>`:''}</div></div>`;
       GRANTS[p.id]=()=>{if(p.give.tuy)save.tuy+=p.give.tuy;if(p.give.coins)save.coins+=p.give.coins;if(p.give.noads){save.noads=true;if(window.FlixAds)FlixAds.setAdsRemoved(true);}if(p.give.themes)save.themes=THEME_ORDER.slice();};
-      const bt=document.createElement('button');bt.className=own?'b-on':'b-iap';bt.textContent=own?t('bought'):p.iap;bt.disabled=own;bt.onclick=()=>buyIAP(p.id,t(p.name),p.iap);
+      const bt=document.createElement('button');bt.className=own?'b-on':'b-iap';bt.textContent=own?t('bought'):iapPrice(p.id,p.iap);bt.disabled=own;bt.onclick=()=>buyIAP(p.id,t(p.name),iapPrice(p.id,p.iap));
       d.appendChild(bt);g.appendChild(d);
       const pc=d.querySelector('.pi'),x=pc.getContext('2d');
       if(p.ic==='tuy'){for(let i=0;i<p.n;i++)sprInto(pc,TH.spr.tuy,1.5-p.n*.08,48+(i-(p.n-1)/2)*13,74-(i%2)*8);}
@@ -545,6 +555,7 @@ function renderShop(){
       else if(p.ic==='all'){['clay','cel','dark'].forEach((id,i)=>{x.save();x.translate(18+i*22,14+i*6);x.rotate(-.12+i*.12);x.fillStyle=['#ff8a5a','#46208a','#120c22'][i];x.strokeStyle='#fff';x.lineWidth=3;x.beginPath();x.roundRect(0,0,36,52,6);x.fill();x.stroke();x.restore();});sprInto(pc,heroSprite(TH,save.skin,'up'),.7,60,60);}
       else{sprInto(pc,TH.spr.bat,.8,48,50);x.strokeStyle='#e22511';x.lineWidth=8;x.lineCap='round';x.beginPath();x.arc(48,48,36,0,TAU);x.moveTo(23,23);x.lineTo(73,73);x.stroke();}}
     const n=document.createElement('div');n.className='tag';n.style.cssText='text-align:center;padding:4px 10px';n.textContent=t('tuyNote');g.appendChild(n);
+    const rb=document.createElement('button');rb.className='big ghost';rb.id='restoreB';rb.style.cssText='grid-column:1/-1;width:100%;margin-top:4px';rb.textContent=t('restore');rb.onclick=restorePurchases;g.appendChild(rb);
   }
   drawIcons();
 }
@@ -553,6 +564,7 @@ FlixLegal.init({game:'ziplama',name:'Flix Jump',version:VERSION,oss:['Nova Hop (
   beforeOpen:()=>{if(state==='play')pauseGame();}});
 $$('#hudLogo,#menuLogo,#adLogo').forEach(i=>i.src=LOGO);
 Sfx.setMuted(save.muted);if(save.noads&&window.FlixAds)FlixAds.setAdsRemoved(true);
+if(window.FlixNative&&FlixNative.flush)try{FlixNative.flush();}catch(e){}
 if(!THEMES[save.theme]||!save.themes.includes(save.theme))save.theme='water';
 if(!SKINS[save.skin])save.skin='kraliyet';
 document.fonts.ready.then(()=>{mode='menu';LV=LEVELS[curLevel()-1];setTheme(save.theme);resetWorld();applyLang();show('#menu');requestAnimationFrame(frame);});

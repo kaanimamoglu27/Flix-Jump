@@ -176,6 +176,7 @@ h2{margin:0;font-family:var(--disp);font-weight:400;font-size:30px;color:var(--y
 #intro{top:15%}#intro .a{font-size:13px;padding:2px 10px;border-radius:9px}#intro .b{font-size:24px;-webkit-text-stroke:5px var(--navy);margin-top:5px}
 .toast{top:24%;font-size:20px;-webkit-text-stroke:5px var(--navy)}
 .note{font-size:12px;padding:5px 11px;background:rgba(11,42,92,.8);bottom:calc(env(safe-area-inset-bottom,0px) + 104px)}
+#settings .setcard{max-height:100%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}#settings .setrow{flex-wrap:wrap}#settings .setrow>*{flex:1 1 40%}#restoreB2{width:100%}
 </style>
 </head>
 <body>
@@ -254,12 +255,13 @@ h2{margin:0;font-family:var(--disp);font-weight:400;font-size:30px;color:var(--y
   </div>
 
   <div class="scr dim" id="settings" hidden>
-    <div class="card"><h2 data-t="settings"></h2>
+    <div class="card setcard"><h2 data-t="settings"></h2>
       <div class="set"><span data-t="sound"></span><div class="seg" id="segSnd"><button data-v="0" data-t="on"></button><button data-v="1" data-t="off"></button></div></div>
       <div class="set"><span data-t="control"></span><div class="seg" id="segCtl"><button data-v="tilt" data-t="tilt"></button><button data-v="drag" data-t="drag"></button><button data-v="side" data-t="side"></button></div></div>
       <div id="tiltNote" hidden></div>
       <div class="set"><span data-t="language"></span><div class="seg" id="segLang"><button data-v="tr">Türkçe</button><button data-v="en">English</button><button data-v="es">Español</button><button data-v="zh">中文</button></div></div>
-      <div class="row"><button class="big ghost" data-flixlegal="legal" data-t="legal"></button><button class="big ghost" data-flixlegal="about" data-t="about"></button></div>
+      <button class="big ghost" id="restoreB2" data-t="restore"></button>
+      <div class="row setrow"><button class="big ghost" data-flixlegal="legal" data-t="legal"></button><button class="big ghost" data-flixlegal="about" data-t="about"></button></div>
       <button class="big" id="setBack" data-t="back"></button>
     </div>
   </div>

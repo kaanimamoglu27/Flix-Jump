@@ -5,7 +5,7 @@ import re, sys, pathlib
 app = pathlib.Path(__file__).resolve().parent.parent
 src = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else app.parent / 'index.html'
 s = src.read_text(encoding='utf-8')
-tags = '<script src="ads-config.js"></script>\n<script src="ads.js"></script>\n<script src="native-bridge.js"></script>\n'
+tags = '<script src="ads-config.js"></script>\n<script src="ads.js"></script>\n<script src="native-bridge.js"></script>\n<script src="flix-privacy.js"></script>\n'
 if '</head>' not in s: sys.exit('no </head> in game file')
 s = s.replace('</head>', tags + '</head>', 1)
 left = re.findall(r'(?:src|href)="(https?://[^"]+)"', s)

@@ -2,6 +2,10 @@
 
 Flix oyuncaklarının dikey zıplama oyunu. 20 bölüm (her 5 bölümde bir patron), sonsuz mod, 9 görsel tema, karakter ve kötü karakter kostümleri, 4 dil (TR, EN, ES, ZH).
 
+## 1.3.5 (2026-11-17)
+- Kilitli **Sonsuz mod**'a dokununca açıklama çıkıyor: nasıl açılır (5. bölümü bitir), ilerleme çubuğu (ör. 2/5), 4 adım ve sıradaki bölümü başlatan OYNA düğmesi. İkonda küçük kilit. 4 dilde.
+- Onay penceresinin düğme yazısı her açılışta sıfırlanıyor.
+
 ## Dosyalar
 - `index.html`: oyunun tek dosyalık, oynanabilir hali (tarayıcıda açılır).
 - `src/`: kaynak. `python3 src/build.py` ile `index.html` yeniden üretilir.

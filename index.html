@@ -147,6 +147,8 @@ h2{margin:0;font-family:var(--disp);font-weight:400;font-size:30px;color:var(--y
 .dk svg{width:48px;height:48px;padding:11px;box-sizing:border-box;border-radius:50%;background:#f7f0dd;border:3px solid var(--navy);box-shadow:0 3px 0 var(--navy);fill:none;stroke:var(--navy);stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
 .dk:active svg{transform:translateY(2px);box-shadow:0 1px 0 var(--navy)}
 .dk:disabled{opacity:.5}
+.dk{position:relative}.dk.locked>svg:last-of-type,.dk.locked>span{opacity:.55}.lockB{display:none;position:absolute;top:-4px;right:-6px;width:24px;height:24px;border-radius:50%;background:var(--navy);border:2px solid #f7f0dd;z-index:1}.dk.locked .lockB{display:block}.lockB svg{width:24px!important;height:24px!important;padding:5px!important;border:none!important;box-shadow:none!important;background:none!important;stroke:#ffc20e!important;stroke-width:2.6!important}
+.elk{margin:10px 0 4px;text-align:left;font-size:14px;line-height:1.45}.elk ol{margin:6px 0 0;padding-left:20px}.elk .bar{height:12px;border-radius:6px;background:rgba(11,42,92,.15);overflow:hidden;margin:8px 0 2px}.elk .bar i{display:block;height:100%;background:#ffc20e}
 .solid{background:radial-gradient(circle at 15% 8%,rgba(226,37,17,.07),transparent 42%),radial-gradient(circle at 88% 92%,rgba(11,42,92,.09),transparent 46%),#f7f0dd;color:var(--navy)}
 .card{background:#f7f0dd;color:var(--navy);border:3px solid var(--navy);box-shadow:0 7px 0 rgba(11,42,92,.95);border-radius:16px}
 .solid h2,.card h2{color:var(--red)}
@@ -223,7 +225,7 @@ h2{margin:0;font-family:var(--disp);font-weight:400;font-size:30px;color:var(--y
       <div class="dock">
         <button class="dk" id="lvB"><svg viewBox="0 0 24 24"><path d="M4 6h3M11 6h9M4 12h3M11 12h9M4 18h3M11 18h9"/></svg><span data-t="levels"></span></button>
         <button class="dk" id="shopB"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1.2 11.5a1 1 0 0 1-1 .9H7.2a1 1 0 0 1-1-.9zM9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span data-t="shop"></span></button>
-        <button class="dk" id="endB"><svg viewBox="0 0 24 24"><path d="M12 12c-1.6-2.2-3-3.5-5-3.5a3.5 3.5 0 0 0 0 7c2 0 3.400-1.300 5-3.500zm0 0c1.600 2.200 3 3.500 5 3.500a3.500 3.500 0 0 0 0-7c-2 0-3.400 1.300-5 3.500z"/></svg><span id="endT"></span></button>
+        <button class="dk" id="endB"><i class="lockB" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></i><svg viewBox="0 0 24 24"><path d="M12 12c-1.6-2.2-3-3.5-5-3.5a3.5 3.5 0 0 0 0 7c2 0 3.400-1.300 5-3.500zm0 0c1.600 2.200 3 3.500 5 3.500a3.500 3.500 0 0 0 0-7c-2 0-3.400 1.300-5 3.500z"/></svg><span id="endT"></span></button>
         <button class="dk" id="setB2"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg><span data-t="settings"></span></button>
       </div>
     </div>
@@ -1055,6 +1057,8 @@ const LANGS=['tr','en','es','zh'],LANG_NAME={tr:'Türkçe',en:'English',es:'Espa
 const STR={
  play:['OYNA','PLAY','JUGAR','开始'],shop:['Mağaza','Shop','Tienda','商店'],settings:['Ayarlar','Settings','Ajustes','设置'],levels:['Bölümler','Levels','Niveles','关卡'],
  endless:['Sonsuz mod','Endless','Infinito','无尽模式'],endlessLock:['5. bölümü bitirince açılır','Unlocks after level 5','Se abre tras el nivel 5','通过第5关后解锁'],
+ endlessProg:['Biten bölüm: {a}/5','Levels cleared: {a}/5','Niveles superados: {a}/5','已通关：{a}/5'],
+ endlessHow:['<ol><li>Ana ekranda <b>OYNA</b>\'ya bas, sıradaki bölümü oyna.</li><li>Bölümün tepesindeki bitiş çizgisine ulaş, bölüm biter.</li><li>5. bölümün sonunda patronu (İskelet Kral) geç.</li><li>Sonsuz mod kendiliğinden açılır: kule hiç bitmez, en yüksek skoru kovala.</li></ol>Sıradaki: <b>Bölüm {n}</b>','<ol><li>Tap <b>PLAY</b> on the home screen and play the next level.</li><li>Reach the finish line at the top to clear it.</li><li>Beat the boss (Skeleton King) at the end of level 5.</li><li>Endless unlocks by itself: the tower never ends, chase your best score.</li></ol>Next up: <b>Level {n}</b>','<ol><li>Pulsa <b>JUGAR</b> y juega el siguiente nivel.</li><li>Llega a la meta de arriba para superarlo.</li><li>Vence al jefe (Rey Esqueleto) al final del nivel 5.</li><li>El modo infinito se abre solo: la torre no termina, busca tu mejor récord.</li></ol>Siguiente: <b>Nivel {n}</b>','<ol><li>在主界面点<b>开始</b>，玩下一关。</li><li>到达顶端的终点线即可过关。</li><li>在第5关结尾打败头目（骷髅王）。</li><li>无尽模式自动解锁：高塔没有尽头，挑战最高分。</li></ol>下一关：<b>第{n}关</b>'],
  level:['Bölüm','Level','Nivel','关卡'],bossLv:['PATRON','BOSS','JEFE','头目'],paused:['Durakladı','Paused','Pausa','已暂停'],resume:['Devam','Resume','Seguir','继续'],restart:['Yeniden başla','Restart','Reiniciar','重新开始'],
  menu:['Ana menü','Main menu','Menú','主菜单'],fell:['Düştün!','You fell!','¡Caíste!','掉下去了！'],hit:['Yakalandın!','Caught!','¡Atrapado!','被抓住了！'],done:['Bölüm tamam!','Level clear!','¡Nivel superado!','过关！'],
  score:['Skor','Score','Puntos','分数'],best:['Rekor','Best','Récord','最高'],coinsWon:['Altın','Coins','Monedas','金币'],tuyWon:['Flix tüyü','Flix feathers','Plumas Flix','Flix羽毛'],
@@ -1708,7 +1712,7 @@ function wallet(){$$('.wCoin').forEach(e=>e.textContent=save.coins);$$('.wTuy').
 function curLevel(){return clamp(Math.min(save.open,save.done+1),1,20);}
 function enName(id){const li=Math.max(0,LANGS.indexOf(save.lang));return STR.ensk[id][li];}
 function refreshMenu(){wallet();const n=curLevel();$('#playSub').textContent=t('level')+' '+n+' · '+lvName(n);
-  const eb=$('#endB'),open=save.done>=5;$('#endT').textContent=t('endless');$('#playT').textContent=t('play');eb.disabled=!open;eb.title=open?'':t('endlessLock');}
+  const eb=$('#endB'),open=save.done>=5;$('#endT').textContent=t('endless');$('#playT').textContent=t('play');eb.disabled=false;eb.classList.toggle('locked',!open);eb.title=open?'':t('endlessLock');}
 function begin(){Sfx.init();hudCache={};$('#bossBar').hidden=true;$('#prog').hidden=mode!=='level';
   $('#best').textContent=t('best')+' '+(mode==='endless'?save.bestEndless:save.best);
   const pi=$('#progIc');pi.getContext('2d').clearRect(0,0,52,52);if(mode==='level'){if(LV.boss)sprInto(pi,TH.spr[BOSS[LV.boss].spr],.28,26,30);else sprInto(pi,TH.spr.goal,.36,26,44);}
@@ -1726,7 +1730,8 @@ $('#playB').onclick=playNow;
 $('#againB').onclick=()=>mode==='endless'?goEndless():goLevel(LV.n);$('#rstB').onclick=()=>mode==='endless'?goEndless():goLevel(LV.n);
 $('#resB').onclick=()=>{state='play';show(null);};
 $('#pauseB').onclick=pauseGame;$('#pMenuB').onclick=toMenu;$('#oMenuB').onclick=toMenu;
-$('#endB').onclick=()=>{if(save.done>=5)goEndless();};
+$('#endB').onclick=()=>{if(save.done>=5)return goEndless();Sfx.deny&&Sfx.deny();const d=Math.min(save.done,5),nx=Math.min(5,save.done+1);
+  confirmBox(t('endless'),`<div class="elk"><b>${t('endlessLock')}</b><div class="bar"><i style="width:${d/5*100}%"></i></div><small>${t('endlessProg',{a:d})}</small>${t('endlessHow',{n:nx})}</div>`,()=>goLevel(curLevel()));$('#mOk').textContent=t('play');};
 $('#shopB').onclick=()=>openShop();$('#shopBack').onclick=()=>{refreshMenu();show('#menu');};
 let setFrom='#menu';function openSet(from){setFrom=from;updSet();tiltNote();show('#settings');}
 $('#setB2').onclick=()=>openSet('#menu');$('#pSetB').onclick=()=>openSet('#pause');$('#setBack').onclick=()=>show(setFrom);$('#restoreB2').onclick=restorePurchases;
@@ -1783,7 +1788,7 @@ const PACKS=[
   {id:'jump_themes_all',ic:'all',name:'p_all',iap:'349,99 ₺',give:{themes:'all'}},
   {id:'jump_noads',ic:'noads',name:'p_noads',iap:'79,99 ₺',give:{noads:true}},
 ];
-function confirmBox(title,body,ok){$('#mT').textContent=title;$('#mB').innerHTML=body;drawIcons();$('#modal').hidden=false;$('#mOk').hidden=!ok;
+function confirmBox(title,body,ok){$('#mT').textContent=title;$('#mOk').textContent=t('ok');$('#mB').innerHTML=body;drawIcons();$('#modal').hidden=false;$('#mOk').hidden=!ok;
   $('#mOk').onclick=()=>{$('#modal').hidden=true;ok&&ok();};$('#mNo').onclick=()=>{$('#modal').hidden=true;};}
 const GRANTS={};
 function grantIAP(id){const g=GRANTS[id];if(g){g();persist();wallet();if(!$('#shop').hidden)renderShop();Sfx.unlock();}}

@@ -401,7 +401,7 @@ function wallet(){$$('.wCoin').forEach(e=>e.textContent=save.coins);$$('.wTuy').
 function curLevel(){return clamp(Math.min(save.open,save.done+1),1,20);}
 function enName(id){const li=Math.max(0,LANGS.indexOf(save.lang));return STR.ensk[id][li];}
 function refreshMenu(){wallet();const n=curLevel();$('#playSub').textContent=t('level')+' '+n+' · '+lvName(n);
-  const eb=$('#endB'),open=save.done>=5;$('#endT').textContent=t('endless');$('#playT').textContent=t('play');eb.disabled=!open;eb.title=open?'':t('endlessLock');}
+  const eb=$('#endB'),open=save.done>=5;$('#endT').textContent=t('endless');$('#playT').textContent=t('play');eb.disabled=false;eb.classList.toggle('locked',!open);eb.title=open?'':t('endlessLock');}
 function begin(){Sfx.init();hudCache={};$('#bossBar').hidden=true;$('#prog').hidden=mode!=='level';
   $('#best').textContent=t('best')+' '+(mode==='endless'?save.bestEndless:save.best);
   const pi=$('#progIc');pi.getContext('2d').clearRect(0,0,52,52);if(mode==='level'){if(LV.boss)sprInto(pi,TH.spr[BOSS[LV.boss].spr],.28,26,30);else sprInto(pi,TH.spr.goal,.36,26,44);}
@@ -419,7 +419,8 @@ $('#playB').onclick=playNow;
 $('#againB').onclick=()=>mode==='endless'?goEndless():goLevel(LV.n);$('#rstB').onclick=()=>mode==='endless'?goEndless():goLevel(LV.n);
 $('#resB').onclick=()=>{state='play';show(null);};
 $('#pauseB').onclick=pauseGame;$('#pMenuB').onclick=toMenu;$('#oMenuB').onclick=toMenu;
-$('#endB').onclick=()=>{if(save.done>=5)goEndless();};
+$('#endB').onclick=()=>{if(save.done>=5)return goEndless();Sfx.deny&&Sfx.deny();const d=Math.min(save.done,5),nx=Math.min(5,save.done+1);
+  confirmBox(t('endless'),`<div class="elk"><b>${t('endlessLock')}</b><div class="bar"><i style="width:${d/5*100}%"></i></div><small>${t('endlessProg',{a:d})}</small>${t('endlessHow',{n:nx})}</div>`,()=>goLevel(curLevel()));$('#mOk').textContent=t('play');};
 $('#shopB').onclick=()=>openShop();$('#shopBack').onclick=()=>{refreshMenu();show('#menu');};
 let setFrom='#menu';function openSet(from){setFrom=from;updSet();tiltNote();show('#settings');}
 $('#setB2').onclick=()=>openSet('#menu');$('#pSetB').onclick=()=>openSet('#pause');$('#setBack').onclick=()=>show(setFrom);$('#restoreB2').onclick=restorePurchases;
@@ -476,7 +477,7 @@ const PACKS=[
   {id:'jump_themes_all',ic:'all',name:'p_all',iap:'349,99 ₺',give:{themes:'all'}},
   {id:'jump_noads',ic:'noads',name:'p_noads',iap:'79,99 ₺',give:{noads:true}},
 ];
-function confirmBox(title,body,ok){$('#mT').textContent=title;$('#mB').innerHTML=body;drawIcons();$('#modal').hidden=false;$('#mOk').hidden=!ok;
+function confirmBox(title,body,ok){$('#mT').textContent=title;$('#mOk').textContent=t('ok');$('#mB').innerHTML=body;drawIcons();$('#modal').hidden=false;$('#mOk').hidden=!ok;
   $('#mOk').onclick=()=>{$('#modal').hidden=true;ok&&ok();};$('#mNo').onclick=()=>{$('#modal').hidden=true;};}
 const GRANTS={};
 function grantIAP(id){const g=GRANTS[id];if(g){g();persist();wallet();if(!$('#shop').hidden)renderShop();Sfx.unlock();}}

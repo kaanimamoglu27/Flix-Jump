@@ -479,11 +479,23 @@ const PACKS=[
 ];
 function confirmBox(title,body,ok){$('#mT').textContent=title;$('#mOk').textContent=t('ok');$('#mB').innerHTML=body;drawIcons();$('#modal').hidden=false;$('#mOk').hidden=!ok;
   $('#mOk').onclick=()=>{$('#modal').hidden=true;ok&&ok();};$('#mNo').onclick=()=>{$('#modal').hidden=true;};}
-const GRANTS={};
-function grantIAP(id){const g=GRANTS[id];if(g){g();persist();wallet();if(!$('#shop').hidden)renderShop();Sfx.unlock();}}
-window.__flixGrant=(id,tx)=>{if(tx){if(save.tx.includes(tx))return true;save.tx.push(tx);if(save.tx.length>80)save.tx.shift();}grantIAP(id);return true;};
-// App Store price in the player's own currency once the store has loaded; the built-in TL label until then / on the web
-function iapPrice(id,fallback){const p=window.FlixNative&&FlixNative.price&&FlixNative.price(id);return p||fallback;}
+// What every App Store product gives, known from launch. (IAP fix, Nov 2026: this used to be filled in only while a shop tab
+// was drawn, so a purchase that arrived at launch, after Ask to Buy or from Restore before that tab was opened was finished
+// by the store without being given.) sel: a fresh purchase also puts the bought skin / theme on; a restore only adds it.
+function grantFor(id,sel){
+  const p=PACKS.find(q=>q.id===id);
+  if(p)return()=>{if(p.give.tuy)save.tuy+=p.give.tuy;if(p.give.coins)save.coins+=p.give.coins;if(p.give.noads){save.noads=true;if(window.FlixAds)FlixAds.setAdsRemoved(true);}if(p.give.themes)save.themes=THEME_ORDER.slice();};
+  const sk=Object.keys(SKINS).find(k=>SKINS[k].iapId===id);
+  if(sk)return()=>{if(!save.skins.includes(sk))save.skins.push(sk);if(sel)save.skin=sk;};
+  const th=id.indexOf('jump_theme_')===0?id.slice(11):'';
+  if(th&&THEMES[th]&&THEMES[th].iap)return()=>{if(!save.themes.includes(th))save.themes.push(th);if(sel){save.theme=th;if(TH)setTheme(th);}};
+  return null;
+}
+function grantIAP(id,sel){const g=grantFor(id,sel!==false);if(!g)return false;g();persist();wallet();if(!$('#shop').hidden)renderShop();Sfx.unlock();return true;}
+// Called by native-bridge.js once per App Store transaction (tx) before it is finished; tx null = non-consumable already owned (restore / reinstall)
+window.__flixGrant=(id,tx)=>{if(tx&&save.tx.includes(tx))return true;if(!grantFor(id,false))return false;if(tx){save.tx.push(tx);if(save.tx.length>80)save.tx.shift();}grantIAP(id,!!tx);return true;};
+// App Store price in the player's own currency; in the app "…" until the store has loaded (never a hard-coded TL price), the TL label only in the web demo
+function iapPrice(id,fallback){const p=window.FlixNative&&FlixNative.price&&FlixNative.price(id);return p||(window.FlixNative?'…':fallback);}
 window.addEventListener('flixprices',()=>{if(!$('#shop').hidden)renderShop();});
 function buyIAP(id,label,price){
   if(window.FlixNative&&FlixNative.buy){FlixNative.buy(id).then(r=>{if(r==='pending')confirmBox(label,t('buyPending'),null);});return;}
@@ -507,7 +519,7 @@ function priceBtn(cls,amt,cur){const b=document.createElement('button');b.classN
 function restorePurchases(){
   if(!(window.FlixNative&&FlixNative.restore)){confirmBox(t('restore'),t('restoreNone'),null);return;}
   $$('#restoreB,#restoreB2').forEach(b=>b.disabled=true);
-  FlixNative.restore().then(ids=>{confirmBox(t('restore'),t(ids&&ids.length?'restoreOk':'restoreNone'),null);},()=>confirmBox(t('restore'),t('restoreFail'),null))
+  FlixNative.restore().then(ids=>{(ids||[]).forEach(id=>grantIAP(id,false));confirmBox(t('restore'),t(ids&&ids.length?'restoreOk':'restoreNone'),null);},()=>confirmBox(t('restore'),t('restoreFail'),null))
     .finally(()=>{$$('#restoreB,#restoreB2').forEach(b=>b.disabled=false);if(!$('#shop').hidden)renderShop();});
 }
 function renderShop(){
@@ -522,7 +534,7 @@ function renderShop(){
       else if(own){bt=document.createElement('button');bt.textContent=t('use');bt.className='b-use';bt.onclick=()=>{save.skin=id;persist();renderShop();};}
       else{bt=priceBtn('b-buy',s.price,s.cur);bt.disabled=!!locked;bt.onclick=()=>spend(s.cur,s.price,skinName(id),()=>{save.skins.push(id);save.skin=id;});}
       d.appendChild(bt);
-      if(!own&&s.iap&&!locked){GRANTS[s.iapId]=()=>{if(!save.skins.includes(id))save.skins.push(id);save.skin=id;};const b2=document.createElement('button');b2.className='b-iap';b2.textContent=iapPrice(s.iapId,s.iap);b2.onclick=()=>buyIAP(s.iapId,skinName(id),iapPrice(s.iapId,s.iap));d.appendChild(b2);}
+      if(!own&&s.iap&&!locked){const b2=document.createElement('button');b2.className='b-iap';b2.textContent=iapPrice(s.iapId,s.iap);b2.onclick=()=>buyIAP(s.iapId,skinName(id),iapPrice(s.iapId,s.iap));d.appendChild(b2);}
       g.appendChild(d);const c=d.querySelector('canvas.pv');setTimeout(()=>previewInto(c,save.theme,id),0);}
     if(shopTab==='vil'){
       const hd=document.createElement('div');hd.className='world';hd.style.gridColumn='1/-1';hd.innerHTML=t('enTitle')+'<small>'+t('enNote')+'</small>';g.appendChild(hd);
@@ -545,14 +557,13 @@ function renderShop(){
       else if(own){bt=document.createElement('button');bt.textContent=t('use');bt.className='b-use';bt.onclick=()=>{save.theme=id;persist();setTheme(id);renderShop();};}
       else{bt=priceBtn('b-buy',th.price,'tuy');bt.onclick=()=>spend('tuy',th.price,themeName(id),()=>{save.themes.push(id);save.theme=id;setTheme(id);});}
       d.appendChild(bt);
-      if(!own&&th.iap){const pid='jump_theme_'+id;GRANTS[pid]=()=>{if(!save.themes.includes(id))save.themes.push(id);save.theme=id;setTheme(id);};const b2=document.createElement('button');b2.className='b-iap';b2.textContent=iapPrice(pid,th.iap);b2.onclick=()=>buyIAP(pid,themeName(id),iapPrice(pid,th.iap));d.appendChild(b2);}
+      if(!own&&th.iap){const pid='jump_theme_'+id;const b2=document.createElement('button');b2.className='b-iap';b2.textContent=iapPrice(pid,th.iap);b2.onclick=()=>buyIAP(pid,themeName(id),iapPrice(pid,th.iap));d.appendChild(b2);}
       g.appendChild(d);q.push([d.querySelector('canvas.pv'),id]);}
     const next=()=>{const it=q.shift();if(!it||$('#shop').hidden||shopTab!=='theme')return;previewInto(it[0],it[1],save.skin);setTimeout(next,10);};setTimeout(next,30);
   }else{
     for(const p of PACKS){const d=document.createElement('div');d.className='it pk';
       const own=(p.give.noads&&save.noads)||(p.give.themes&&save.themes.length>=9);
       d.innerHTML=`<canvas class="pi" width="96" height="96"></canvas><div class="pt"><div class="nm">${t(p.name)}${p.best?`<span class="badge">${t('bestSeller')}</span>`:''}</div></div>`;
-      GRANTS[p.id]=()=>{if(p.give.tuy)save.tuy+=p.give.tuy;if(p.give.coins)save.coins+=p.give.coins;if(p.give.noads){save.noads=true;if(window.FlixAds)FlixAds.setAdsRemoved(true);}if(p.give.themes)save.themes=THEME_ORDER.slice();};
       const bt=document.createElement('button');bt.className=own?'b-on':'b-iap';bt.textContent=own?t('bought'):iapPrice(p.id,p.iap);bt.disabled=own;bt.onclick=()=>buyIAP(p.id,t(p.name),iapPrice(p.id,p.iap));
       d.appendChild(bt);g.appendChild(d);
       const pc=d.querySelector('.pi'),x=pc.getContext('2d');

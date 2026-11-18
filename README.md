@@ -1,6 +1,11 @@
 # Flix Jump
 
-Flix oyuncaklarının dikey zıplama oyunu. 20 bölüm (her 5 bölümde bir patron), sonsuz mod, 9 görsel tema, karakter ve kötü karakter kostümleri, 4 dil (TR, EN, ES, ZH).
+Flix oyuncaklarının dikey zıplama oyunu. 20 bölüm (her 5 bölümde bir patron), sonsuz mod, 9 görsel tema, karakter ve kötü karakter kostümleri, 7 dil (TR, EN, ES, ZH, FR, DE, AR).
+
+## 1.4 (2026-11-18)
+- **Diller:** Fransızca, Almanca ve Arapça eklendi (7 dil). Türkçe artık her cihazda varsayılan (önceden cihaz diline göre seçiliyordu, Türkçe olmayan cihazda İngilizce açılıyordu). Yeni çeviriler `src/levels_x.tsv` (yol, fr, de, ar); `src/build.py` bunları `STR` dizilerine ekler. Arapça sağdan sola.
+- **Nasıl oynanır** 3 kart daha: her 5 bölümde patron, güçler (kanat, kalkan, süper Flix yağmuru), kontrol noktası ve reklamlar. Ekran kaydırılabilir.
+- **Reklam:** geçiş reklamı en fazla 2 dakikada bir (önceden 60 saniye), diğer FLIX oyunlarıyla aynı aralık.
 
 ## 1.3.5 (2026-11-17)
 - **Satın alma hatası düzeldi:** ödeme ekranı açılır açılmaz kalıcı ürün (tema, kostüm, reklamsız) veriliyordu; ödemeyi kapatsan bile kalıyordu. cordova-plugin-purchase, ödeme ekranı açıkken geçici bir "virtual" işlem oluşturuyor ve `store.owned()` onu sahip olunmuş sayıyor. `native-bridge.js` artık sadece gerçek, onaylanmış ya da bitmiş işlemlere bakıyor (`realOwned`).

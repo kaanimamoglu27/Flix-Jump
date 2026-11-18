@@ -12,12 +12,12 @@ const SAVE_KEY='flixJump1';
 let save={coins:0,tuy:0,best:0,bestEndless:0,skins:['kraliyet'],skin:'kraliyet',themes:['water'],theme:'water',muted:false,ctl:'tilt',enSkins:['none'],enSkin:'none',lang:null,how:false,noads:false,done:0,open:1,runs:0,tx:[]};
 try{const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(s)save=Object.assign(save,s);}catch(e){}
 function persist(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}}
-if(!save.lang){const l=(navigator.language||'tr').slice(0,2).toLowerCase();save.lang=LANGS.includes(l)?l:'en';}
+if(!save.lang||!LANGS.includes(save.lang))save.lang='tr'; // Turkish is the default on every device; the player picks another language in Settings
 // ---------- i18n
 function t(k,vars){let v=STR[k];v=v?v[LANGS.indexOf(save.lang)]||v[1]:k;if(vars)for(const q in vars)v=v.replace('{'+q+'}',vars[q]);return v;}
 const lvName=n=>STR.L[n-1][LANGS.indexOf(save.lang)];
 const skinName=id=>STR.skin[id][LANGS.indexOf(save.lang)],themeName=id=>STR.theme[id][LANGS.indexOf(save.lang)];
-function applyLang(){document.documentElement.lang=save.lang;$$('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));$('#h1t').textContent=t(ctlEff()==='tilt'?'h1':'h1d');refreshMenu();}
+function applyLang(){document.documentElement.lang=save.lang;document.documentElement.classList.toggle('rtl',save.lang==='ar');$$('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));$('#h1t').textContent=t(ctlEff()==='tilt'?'h1':'h1d');refreshMenu();}
 // ---------- canvas / theme
 const cv=$('#cv'),cx=cv.getContext('2d');
 let TH=null,k=2,LV=LEVELS[0];
@@ -462,7 +462,7 @@ const Ads={
   rewarded(){return new Promise(res=>{
     if(window.FlixAds){FlixAds.showRewarded(6000).then(r=>{Ads.lastR=Date.now();if(r==='unavailable')Ads.house(res);else res(r==='rewarded');});return;}
     Ads.house(res);});},
-  maybeInterstitial(){if(save.noads||!window.FlixAds)return;const now=Date.now();if(save.runs%2!==0||now-Ads.lastI<60000||now-Ads.lastR<60000)return;Ads.lastI=now;FlixAds.showInterstitial();},
+  maybeInterstitial(){if(save.noads||!window.FlixAds)return;const now=Date.now();if(save.runs%2!==0||now-Ads.lastI<120000||now-Ads.lastR<60000)return;/* at most one interstitial per 2 minutes, like the other FLIX games */Ads.lastI=now;FlixAds.showInterstitial();},
 };
 // ---------- shop
 let shopTab='skin';

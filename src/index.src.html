@@ -108,6 +108,10 @@ h2{margin:0;font-family:var(--disp);font-weight:400;font-size:30px;color:var(--y
 /* how to */
 .how{display:flex;align-items:center;gap:12px;text-align:left}
 .how canvas{width:92px;height:92px;border-radius:16px;background:var(--navy2);flex:none}
+.how .hic{width:92px;height:92px;border-radius:16px;background:var(--navy2);flex:none;display:flex;align-items:center;justify-content:center;font-size:44px;font-style:normal}
+#how .card{max-height:calc(100% - 90px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+html.rtl body *{unicode-bidi:plaintext}
+#segLang{flex-wrap:wrap}#segLang button{flex:1 0 28%}
 .how b{display:block;font-size:17px;line-height:1.2;color:#fff}.how span{font-size:13.5px;color:#b9c6f2;line-height:1.3;display:block;margin-top:3px}
 /* transitions */
 #iris{position:absolute;inset:0;pointer-events:none;z-index:8}
@@ -262,7 +266,7 @@ h2{margin:0;font-family:var(--disp);font-weight:400;font-size:30px;color:var(--y
       <div class="set"><span data-t="sound"></span><div class="seg" id="segSnd"><button data-v="0" data-t="on"></button><button data-v="1" data-t="off"></button></div></div>
       <div class="set"><span data-t="control"></span><div class="seg" id="segCtl"><button data-v="tilt" data-t="tilt"></button><button data-v="drag" data-t="drag"></button><button data-v="side" data-t="side"></button></div></div>
       <div id="tiltNote" hidden></div>
-      <div class="set"><span data-t="language"></span><div class="seg" id="segLang"><button data-v="tr">Türkçe</button><button data-v="en">English</button><button data-v="es">Español</button><button data-v="zh">中文</button></div></div>
+      <div class="set"><span data-t="language"></span><div class="seg" id="segLang"><button data-v="tr">Türkçe</button><button data-v="en">English</button><button data-v="es">Español</button><button data-v="zh">中文</button><button data-v="fr">Français</button><button data-v="de">Deutsch</button><button data-v="ar">العربية</button></div></div>
       <button class="big ghost" id="restoreB2" data-t="restore"></button>
       <div class="row setrow"><button class="big ghost" data-flixlegal="legal" data-t="legal"></button><button class="big ghost" data-flixlegal="about" data-t="about"></button></div>
       <button class="big" id="setBack" data-t="back"></button>
@@ -275,6 +279,9 @@ h2{margin:0;font-family:var(--disp);font-weight:400;font-size:30px;color:var(--y
       <div class="how"><canvas id="how1" width="184" height="184"></canvas><div><b id="h1t"></b><span data-t="h1b"></span></div></div>
       <div class="how"><canvas id="how2" width="184" height="184"></canvas><div><b data-t="h2"></b><span data-t="h2b"></span></div></div>
       <div class="how"><canvas id="how3" width="184" height="184"></canvas><div><b data-t="h3"></b><span data-t="h3b"></span></div></div>
+      <div class="how"><i class="hic">👑</i><div><b data-t="h4"></b><span data-t="h4b"></span></div></div>
+      <div class="how"><i class="hic">🪶</i><div><b data-t="h5"></b><span data-t="h5b"></span></div></div>
+      <div class="how"><i class="hic">🚩</i><div><b data-t="h6"></b><span data-t="h6b"></span></div></div>
       <button class="big red" id="howOk" data-t="gotIt"></button>
     </div>
   </div>

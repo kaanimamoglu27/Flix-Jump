@@ -187,6 +187,12 @@ h2{margin:0;font-family:var(--disp);font-weight:400;font-size:30px;color:var(--y
 .toast{top:24%;font-size:20px;-webkit-text-stroke:5px var(--navy)}
 .note{font-size:12px;padding:5px 11px;background:rgba(11,42,92,.8);bottom:calc(env(safe-area-inset-bottom,0px) + 104px)}
 #settings .setcard{max-height:100%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}#settings .setrow{flex-wrap:wrap}#settings .setrow>*{flex:1 1 40%}#restoreB2{width:100%}
+#settings .setrow>[data-flixprivacy]{order:3;flex-basis:100%}
+/* small phones (iPhone SE 1st gen, 320x568): the whole card incl. "Geri" fits without scrolling */
+@media (max-height:700px){#settings{padding-top:calc(env(safe-area-inset-top,0px) + 8px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
+#settings .setcard{padding:10px 12px;gap:6px}#settings h2{font-size:24px}#settings .set{gap:3px;font-size:13px}
+#settings .seg button{padding:5px 2px;font-size:12px;line-height:1.15}#settings .big{padding:7px 10px;font-size:16px;box-shadow:0 3px 0 var(--navy)}
+#settings #tiltNote{margin:-2px 0 2px;font-size:11px}}
 </style>
 </head>
 <body>
@@ -1076,6 +1082,10 @@ const STR={
  tuyNote:['Flix tüyü oyunda nadir çıkar. Bölüm bitirince ve patron yenince de kazanılır.','Flix feathers are rare. You also earn them by clearing levels and beating bosses.','Las plumas Flix son raras. También se ganan al superar niveles y jefes.','Flix羽毛很稀有，通关和击败头目也能获得。'],
  restore:['Satın alımları geri yükle','Restore purchases','Restaurar compras','恢复购买'],restoreOk:['Satın alımların geri yüklendi.','Your purchases have been restored.','Tus compras se han restaurado.','已恢复你的购买。'],
  restoreNone:['Geri yüklenecek satın alım bulunamadı.','No purchases to restore.','No hay compras para restaurar.','没有可恢复的购买。'],restoreFail:['Mağazaya ulaşılamadı. Biraz sonra tekrar dene.','Could not reach the App Store. Please try again later.','No se pudo conectar con la tienda. Inténtalo más tarde.','无法连接 App Store，请稍后再试。'],
+ buyFail:['Satın alma tamamlanmadı. Biraz sonra tekrar deneyebilirsin.','The purchase was not completed. Please try again.','La compra no se completó. Inténtalo de nuevo.','购买未完成，请重试。'],
+ buyNoStore:['Mağazaya ulaşılamadı. İnternet bağlantını kontrol edip biraz sonra tekrar dene.','Could not reach the App Store. Check your connection and try again later.','No se pudo conectar con la tienda. Revisa tu conexión e inténtalo más tarde.','无法连接 App Store，请检查网络后稍后再试。'],
+ allDone:['Tebrikler!','Congratulations!','¡Enhorabuena!','恭喜！'],
+ allDoneSub:['20 bölümün hepsini bitirdin! Şimdi Sonsuz mod\'da rekorunu kovala.','You cleared all 20 levels! Now chase your record in Endless mode.','¡Superaste los 20 niveles! Ahora persigue tu récord en el modo Infinito.','你通过了全部20关！现在去无尽模式挑战纪录吧。'],
  buyPending:['Satın alma onay bekliyor. Onaylanınca ürün açılacak.','Purchase is waiting for approval. The item unlocks once approved.','La compra espera aprobación. Se desbloqueará al aprobarse.','购买正在等待批准，批准后即可解锁。'],
  p_t100:['100 Flix tüyü','100 Flix feathers','100 plumas Flix','100 Flix羽毛'],p_t300:['300 Flix tüyü','300 Flix feathers','300 plumas Flix','300 Flix羽毛'],p_t800:['800 Flix tüyü','800 Flix feathers','800 plumas Flix','800 Flix羽毛'],p_t2000:['2000 Flix tüyü','2000 Flix feathers','2000 plumas Flix','2000 Flix羽毛'],
  p_c5000:['5000 altın','5000 coins','5000 monedas','5000金币'],p_all:['Tüm temalar','All themes','Todos los temas','全部主题'],p_noads:['Reklamsız oyna','Remove ads','Sin anuncios','去除广告'],bestSeller:['En çok satan','Best seller','Más vendido','最畅销'],bought:['Alındı','Owned','Comprado','已购买'],
@@ -1313,7 +1323,7 @@ function heroSprite(T,skin,pose){
    Zıplama fiziği, platform üretimi, kamera ve ses motoru Nova Hop'tan uyarlandı
    (github.com/nikhilrana2715/Doodle-Jump-website-Game, ISC License, © 2025-2026 Nikhil Rana). */
 'use strict';
-const VERSION='1.3.4';
+const VERSION='1.3.6';
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 const rand=(a,b)=>a+Math.random()*(b-a),chance=p=>Math.random()<p,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t;
 const GRAV=0.42,JUMP=-11.6,SPRING_V=-19.5,MAX_FALL=15,GW=390;
@@ -1328,7 +1338,7 @@ if(!save.lang){const l=(navigator.language||'tr').slice(0,2).toLowerCase();save.
 function t(k,vars){let v=STR[k];v=v?v[LANGS.indexOf(save.lang)]||v[1]:k;if(vars)for(const q in vars)v=v.replace('{'+q+'}',vars[q]);return v;}
 const lvName=n=>STR.L[n-1][LANGS.indexOf(save.lang)];
 const skinName=id=>STR.skin[id][LANGS.indexOf(save.lang)],themeName=id=>STR.theme[id][LANGS.indexOf(save.lang)];
-function applyLang(){document.documentElement.lang=save.lang;$$('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));$('#h1t').textContent=t(ctlEff()==='tilt'?'h1':'h1d');refreshMenu();}
+function applyLang(){document.documentElement.lang=save.lang;try{localStorage.setItem('flixLegalLang',save.lang==='tr'?'tr':'en');}catch(e){}window.dispatchEvent(new Event('flixlang'));$$('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));$('#h1t').textContent=t(ctlEff()==='tilt'?'h1':'h1d');refreshMenu();}
 // ---------- canvas / theme
 const cv=$('#cv'),cx=cv.getContext('2d');
 let TH=null,k=2,LV=LEVELS[0];
@@ -1349,7 +1359,7 @@ function drawIcons(){
 }
 // ---------- world
 let state='menu',mode='level',tick=0,camY=0,alt=0,bonus=0,topGenY=0,lastEnemyY=0,shake=0,dyingT=0,winT=0,genDone=false,goalY=null;
-let PL,plats,items,coins,tuys,ens,shots,orbs,parts,popups,boss,runCoins,runTuy,superCh,fireHeld=false,fireCd=0,passedBest=false,revived=false,lavaY=0,windT=0,windDir=1,segN=0,doubled=false,lastWon=false;
+let lastSolidY=0,runSettled=false,PL,plats,items,coins,tuys,ens,shots,orbs,parts,popups,boss,runCoins,runTuy,superCh,fireHeld=false,fireCd=0,passedBest=false,revived=false,lavaY=0,windT=0,windDir=1,segN=0,doubled=false,lastWon=false;
 function mkPlat(x,y,w,type){return {x,y,w,type,vx:0,bounce:0,broken:false,fall:0,rot:0,dead:false,gone:0};}
 const snapW=w=>PLAT_W.reduce((a,b)=>Math.abs(b-w)<Math.abs(a-w)?b:a);
 function F(){return LV.f||{};}
@@ -1360,26 +1370,35 @@ function resetWorld(base){altBase=base||0;
   quipN=Math.floor(altBase/2600);alt=altBase;bonus=0;shake=0;dyingT=0;winT=0;lastEnemyY=0;runCoins=0;runTuy=0;superCh=0;passedBest=false;revived=false;genDone=false;goalY=null;windT=0;segN=0;doubled=false;
   plats.push(mkPlat(0,0,GW,'ground'));
   PL={x:GW/2,y:-34,vx:0,vy:0,r:34,hw:18,face:1,sx:1,sy:1,wing:0,shield:0,dead:false,throwT:0,rot:0,inv:0};
-  camY=-GH*0.76;topGenY=0;lavaY=260;genUntil(camY-400);
+  camY=-GH*0.76;topGenY=0;lastSolidY=0;lavaY=260;genUntil(camY-400);
 }
 function diff(){if(mode==='endless')return clamp(.05+alt/26000,0,1.15);return clamp(LV.D+(alt/LV.alt)*.12,0,1.1);}
 function genUntil(lim){while(topGenY>lim&&!genDone)spawnRow();}
+// v1.3.6 (QA: endless softlock): a cloud breaks after one bounce, glass never holds and a blinking platform is away 1/3 of the
+// time, so they don't count as a sure way up. The next solid platform (ground, normal, ice, moving, goal) is never more than reachMax() above the last one:
+// before, a cloud row between two solid rows left up to ~270 px to climb with a ~160 px jump, and endless has no lava to end it.
+function jumpH(){const lg=F().lowg,g=GRAV*(lg?.55:1),v=-JUMP*(lg?.9:1);return v*v/(2*g);}
+function reachMax(){return jumpH()-28;}
 function spawnRow(){
   const d=diff(),f=F(),en=LV.en||{},bossPhase=!!LV.boss&&mode==='level'&&alt>=LV.alt-300;
-  const lowg=f.lowg?1.35:1;
-  const gap=rand(50+40*d,74+48*d)*lowg;topGenY-=gap;const y=topGenY;
+  const lowg=f.lowg?1.35:1,lim=reachMax(),minG=40*lowg;
+  const r=Math.random(),pMove=(f.move||0)+(alt>500?.05+.12*d:0),pCloud=f.cloud||0;
+  let moving=false,cloud=false;if(r<pMove)moving=true;else if(r<pMove+pCloud)cloud=true;
+  let blink=!cloud&&!!f.blink&&chance(f.blink),weak=cloud||blink;
+  let gap=rand(50+40*d,74+48*d)*lowg;
+  const room=topGenY-lastSolidY+lim; // highest gap that keeps this row within reach of the last solid one
+  if(weak){gap=Math.min(gap,room-minG);if(gap<minG){cloud=blink=weak=false;gap=rand(50+40*d,74+48*d)*lowg;}}
+  gap=Math.max(20,Math.min(gap,room));
+  topGenY-=gap;const y=topGenY;
   if(mode==='level'&&!LV.boss&&-y+altBase>=LV.alt){ // finish line
-    const g=mkPlat(0,y,GW,'goal');plats.push(g);goalY=y;genDone=true;return;}
+    const g=mkPlat(0,y,GW,'goal');plats.push(g);goalY=y;genDone=true;lastSolidY=y;return;}
   let w=snapW(lerp(94,62,d)+rand(-6,6));if(f.tiny)w=snapW(rand(54,68));
   const x=rand(6,GW-w-6);
-  let type=f.ice?'ice':'n';const r=Math.random();
-  const pMove=(f.move||0)+(alt>500?.05+.12*d:0),pCloud=f.cloud||0;
-  let moving=false;
-  if(r<pMove)moving=true;else if(r<pMove+pCloud)type='cloud';
+  const type=cloud?'cloud':f.ice?'ice':'n';if(!weak)lastSolidY=y;
   const pl=mkPlat(x,y,w,type);
   if(moving){pl.mv=1;pl.vx=(rand(.7,1.3)+1.4*d)*(f.fast?1.5:1)*(chance(.5)?1:-1);}
   else if(f.vmove&&chance(f.vmove)){pl.by=y;pl.vt=rand(0,TAU);pl.va=rand(18,34);}
-  if(f.blink&&chance(f.blink)&&type!=='cloud'){pl.blink=1;pl.ph=(Math.random()*170)|0;}
+  if(blink){pl.blink=1;pl.ph=(Math.random()*170)|0;}
   plats.push(pl);
   if(!bossPhase&&alt>250&&chance((f.glass||0)+.06+.1*d)){const cw=snapW(rand(60,74));plats.push(mkPlat(rand(6,GW-cw-6),y+gap*.5,cw,'glass'));}
   let used=false;const q=Math.random(),pS=f.spring||.06;
@@ -1556,8 +1575,17 @@ function quipTick(){const Q=STR.quips,li=LANGS.indexOf(save.lang)<0?0:LANGS.inde
 function endlessSegment(){ // new look + mechanics every 2200 units
   const pool=LEVELS.filter(L=>!L.boss);const L=pool[(segN*3+1)%pool.length];
   LV=Object.assign({},L,{boss:null,alt:1e9,en:Object.assign({zombie:.6,bat:.6},L.en)});
-  TH.setLevel(LV,GW,GH);lavaY=camY+GH+260;toast(lvName(L.n));Sfx.zone();
+  TH.setLevel(LV,GW,GH);lavaY=camY+GH+260;toast(lvName(L.n));Sfx.zone();bridgeGaps();
 }
+// The rows on and above the screen were made for the old zone's jump (low gravity jumps higher). Where two solid rows are now too far
+// apart for the new jump, add solid platforms in between.
+function bridgeGaps(){const lim=reachMax(),f=F();
+  const sol=plats.filter(p=>p.type!=='cloud'&&p.type!=='glass'&&!p.blink&&!p.broken).sort((a,b)=>(b.by!=null?b.by:b.y)-(a.by!=null?a.by:a.y)); // also the ones below: the hero can fall back onto them
+  for(let i=0;i+1<sol.length;i++){const lo=sol[i].by!=null?sol[i].by:sol[i].y,hi=sol[i+1].by!=null?sol[i+1].by:sol[i+1].y,dist=lo-hi;
+    if(dist<=lim)continue;const n=Math.ceil(dist/lim)-1;
+    for(let j=1;j<=n;j++){const w=snapW(rand(70,86));plats.push(mkPlat(rand(6,GW-w-6),lo-dist*j/(n+1),w,f.ice?'ice':'n'));}}
+  const step=lim-40*(f.lowg?1.35:1); // rows above the last solid one (clouds, blinking) must leave room for the next solid row
+  while(lastSolidY-topGenY>step){const w=snapW(rand(70,86)),y=lastSolidY-step;plats.push(mkPlat(rand(6,GW-w-6),y,w,f.ice?'ice':'n'));lastSolidY=y;}}
 function updateBoss(playing){
   if(playing&&!boss&&LV.boss&&mode==='level'&&alt>=LV.alt){const B=BOSS[LV.boss];boss={kind:LV.boss,x:GW/2,y:camY-220,hp:bossKeep[LV.n]||B.hp,max:B.hp,t:0,dead:false,flash:0,vy:0,rot:0,vis:true,a:1};
     $('#bossBar').hidden=false;$('#bossF').style.width=(boss.hp/boss.max*100)+'%';$('#bossN').textContent=t('b_'+LV.boss);toast(t('b_'+LV.boss)+'!');Sfx.zone();shake=8;PL.shield=1;}
@@ -1596,13 +1624,15 @@ function settle(won){
   if(won){const first=save.done<LV.n;tuyGain+=first?levelReward(LV.n):3;coinGain+=60+LV.n*10;if(first){save.done=LV.n;}}
   save.coins+=coinGain;save.tuy+=tuyGain;save.runs++;
   if(mode==='endless'){if(sc>save.bestEndless)save.bestEndless=sc;}else if(sc>save.best)save.best=sc;
-  persist();lastGain={c:coinGain,t:tuyGain};lastWon=won;fillOver(coinGain,tuyGain);
+  persist();lastGain={c:coinGain,t:tuyGain};lastWon=won;runSettled=true;fillOver(coinGain,tuyGain);
 }
+// Pause → Menu / Restart: the coins and feathers picked up so far are kept (once; a finished run has settled already).
+function settleQuit(){if(!runSettled&&(mode==='level'||mode==='endless')&&PL&&(state==='paused'||state==='play'))settle(false);}
 function overButtons(){
-  const ad=$('#adB'),mb=$('#mainB');
+  const ad=$('#adB'),mb=$('#mainB');$('#againB').hidden=false;
   if(lastWon){ad.hidden=doubled;ad.textContent=t('dbl');ad.onclick=()=>Ads.rewarded().then(ok=>{if(!ok)return;doubled=true;save.coins+=lastGain.c;save.tuy+=lastGain.t;persist();fillOver(lastGain.c*2,lastGain.t*2);ad.hidden=true;Sfx.unlock();});
     const nx=LV.n+1;
-    if(nx>20){mb.hidden=true;}
+    if(nx>20){mb.hidden=false;mb.textContent=t('endless');mb.onclick=goEndless;$('#againB').hidden=true;} // all 20 done: on to Endless, not level 20 again
     else{mb.hidden=false;const open=save.open>=nx;mb.innerHTML=open?t('next'):`${t('unlockFor',{n:levelCost(nx)})} <canvas class="ic ic-tuy" width="44" height="44"></canvas>`;drawIcons();
       mb.onclick=()=>{if(save.open>=nx)return goLevel(nx);tryUnlock(nx,()=>goLevel(nx));};}
   }else{
@@ -1619,16 +1649,17 @@ function carryOn(nx){ // next level without a cut: same run keeps going up, the 
   PL.y+=off;camY+=off;boss=null;orbs=[];
   mode='level';LV=LEVELS[nx-1];TH.setLevel(LV,GW,GH);
   altBase=0;ckLv=0;alt=0;bonus=0;runCoins=0;runTuy=0;winT=0;genDone=false;goalY=null;passedBest=false;revived=false;doubled=false;windT=0;lastEnemyY=0;quipN=0;
-  topGenY=camY-30;lavaY=camY+GH+320;PL.wing=34;PL.inv=120;
+  topGenY=camY-30;lastSolidY=topGenY;bridgeGaps();lavaY=camY+GH+320;PL.wing=34;PL.inv=120;
   begin();introBanner(t(LV.boss?'bossLv':'level')+' '+nx,lvName(nx));Sfx.zone();
 }
 function finishWin(){const nx=LV.n+1,n0=LV.n;settle(true);
   if(nx<=20){const cost=levelCost(nx);if(save.open<nx&&save.tuy>=cost){save.tuy-=cost;save.open=nx;persist();}
     if(save.open>=nx){popup(PL.x,PL.y-70,t('done'),'#ffc20e',24);note('+'+lastGain.c+' '+t('coinsWon')+' · +'+lastGain.t+' '+t('tuy'));return carryOn(nx);}}
-  irisDo(PL,()=>{state='over';$('#overT').textContent=t('done');$('#overSub').textContent=t('level')+' '+LV.n+' · '+lvName(LV.n);overButtons();$('#hud').hidden=true;show('#over');Ads.maybeInterstitial();});}
+  const all=n0===20;
+  irisDo(PL,()=>{state='over';$('#overT').textContent=t(all?'allDone':'done');$('#overSub').textContent=all?t('allDoneSub'):t('level')+' '+LV.n+' · '+lvName(LV.n);if(all){Sfx.best();sparkle(PL.x,PL.y,30,[TH.C.yellow,TH.C.white,TH.C.pink]);}overButtons();$('#hud').hidden=true;show('#over');Ads.maybeInterstitial();});}
 function revive(){revived=true;const p=plats.filter(q=>q.type!=='glass'&&!q.broken&&q.y>camY+GH*.3&&q.y<camY+GH*.9)[0];
   PL.dead=false;PL.rot=0;PL.x=p?p.x+p.w/2:GW/2;PL.y=(p?p.y:camY+GH*.6)-80;PL.vy=JUMP;PL.wing=70;PL.shield=1;PL.inv=90;camY=Math.min(camY,PL.y-GH*.5);lavaY=Math.max(lavaY,camY+GH+260);
-  save.coins-=lastGain.c;save.tuy-=lastGain.t;persist();state='play';show(null);$('#hud').hidden=false;}
+  save.coins-=lastGain.c;save.tuy-=lastGain.t;persist();runSettled=false;state='play';show(null);$('#hud').hidden=false;}
 // ---------- render
 function blit(s,x,y,o){
   if(!s)return;const sy0=y-camY;
@@ -1716,7 +1747,7 @@ function refreshMenu(){wallet();const n=curLevel();$('#playSub').textContent=t('
 function begin(){Sfx.init();hudCache={};$('#bossBar').hidden=true;$('#prog').hidden=mode!=='level';
   $('#best').textContent=t('best')+' '+(mode==='endless'?save.bestEndless:save.best);
   const pi=$('#progIc');pi.getContext('2d').clearRect(0,0,52,52);if(mode==='level'){if(LV.boss)sprInto(pi,TH.spr[BOSS[LV.boss].spr],.28,26,30);else sprInto(pi,TH.spr.goal,.36,26,44);}
-  $('#progF').style.height='0%';show(null);$('#hud').hidden=false;updSuper();state='play';updHUD();}
+  $('#progF').style.height='0%';show(null);$('#hud').hidden=false;updSuper();state='play';runSettled=false;updHUD();}
 function startLevel(n){mode='level';LV=LEVELS[n-1];TH.setLevel(LV,GW,GH);resetWorld(ckLv===n?ckBase(LV):0);begin();}
 function goLevel(n){if(save.ctl==='tilt')enableTilt();
   if(state==='menu'&&mode==='menu'&&LV&&LV.n===n&&ckLv!==n){mode='level';quipN=0;begin();introBanner(t(LV.boss?'bossLv':'level')+' '+n,lvName(n));return;}
@@ -1727,9 +1758,9 @@ function toMenu(){irisDo(null,()=>{state='menu';mode='menu';LV=LEVELS[curLevel()
 function pauseGame(){if(state!=='play')return;state='paused';fireHeld=false;show('#pause');}
 function playNow(){if(!save.how){save.how=true;persist();return openHow(()=>goLevel(curLevel()));}goLevel(curLevel());}
 $('#playB').onclick=playNow;
-$('#againB').onclick=()=>mode==='endless'?goEndless():goLevel(LV.n);$('#rstB').onclick=()=>mode==='endless'?goEndless():goLevel(LV.n);
+$('#againB').onclick=()=>mode==='endless'?goEndless():goLevel(LV.n);$('#rstB').onclick=()=>{settleQuit();mode==='endless'?goEndless():goLevel(LV.n);};
 $('#resB').onclick=()=>{state='play';show(null);};
-$('#pauseB').onclick=pauseGame;$('#pMenuB').onclick=toMenu;$('#oMenuB').onclick=toMenu;
+$('#pauseB').onclick=pauseGame;$('#pMenuB').onclick=()=>{settleQuit();toMenu();};$('#oMenuB').onclick=toMenu;
 $('#endB').onclick=()=>{if(save.done>=5)return goEndless();Sfx.deny&&Sfx.deny();const d=Math.min(save.done,5),nx=Math.min(5,save.done+1);
   confirmBox(t('endless'),`<div class="elk"><b>${t('endlessLock')}</b><div class="bar"><i style="width:${d/5*100}%"></i></div><small>${t('endlessProg',{a:d})}</small>${t('endlessHow',{n:nx})}</div>`,()=>goLevel(curLevel()));$('#mOk').textContent=t('play');};
 $('#shopB').onclick=()=>openShop();$('#shopBack').onclick=()=>{refreshMenu();show('#menu');};
@@ -1809,7 +1840,13 @@ window.__flixGrant=(id,tx)=>{if(tx&&save.tx.includes(tx))return true;if(!grantFo
 function iapPrice(id,fallback){const p=window.FlixNative&&FlixNative.price&&FlixNative.price(id);return p||(window.FlixNative?'…':fallback);}
 window.addEventListener('flixprices',()=>{if(!$('#shop').hidden)renderShop();});
 function buyIAP(id,label,price){
-  if(window.FlixNative&&FlixNative.buy){FlixNative.buy(id).then(r=>{if(r==='pending')confirmBox(label,t('buyPending'),null);});return;}
+  // native-bridge.js answers true / 'pending' / 'cancelled' / 'unavailable' / 'busy' / false. Bought: the goods come through __flixGrant.
+  // Closing the payment sheet says nothing; a failed order or a store that can't be reached (prices still "…") says so.
+  if(window.FlixNative&&FlixNative.buy){FlixNative.buy(id).then(r=>{
+      if(r==='pending')confirmBox(label,t('buyPending'),null);
+      else if(r==='unavailable')confirmBox(label,t('buyNoStore'),null);
+      else if(r===false)confirmBox(label,t('buyFail'),null);},
+    ()=>confirmBox(label,t('buyFail'),null));return;}
   confirmBox(label,`<div class="mprice iap">${price}</div><small>${t('testBuy')}</small>`,()=>grantIAP(id));
 }
 function spend(cur,amt,label,ok){const have=cur==='tuy'?save.tuy:save.coins,cn=t(cur==='tuy'?'tuy':'coin');

@@ -8,13 +8,18 @@
   if (!Cap || !Cap.isNativePlatform || !Cap.isNativePlatform()) return;
   var MARK = 'data-flixprivacy';
   function required() { var A = window.FlixAds; return !!(A && A.privacyOptionsRequired && A.privacyOptionsRequired()); }
+  // follows the game's language (<html lang>, set by the game on every language change)
+  var LABELS = { tr: 'Gizlilik Seçenekleri', en: 'Privacy Options', es: 'Opciones de privacidad', zh: '隐私选项' };
   function label() {
-    var l = (document.documentElement.lang || 'tr').toLowerCase();
-    return l.indexOf('tr') === 0 ? 'Gizlilik Seçenekleri' : 'Privacy Options';
+    var l = (document.documentElement.lang || 'tr').toLowerCase().slice(0, 2);
+    return LABELS[l] || LABELS.en;
   }
   function sync() {
-    var on = required();
-    document.querySelectorAll('[' + MARK + ']').forEach(function (b) { b.hidden = !on; b.style.display = on ? '' : 'none'; });
+    var on = required(), tx = '🔒 ' + label();
+    document.querySelectorAll('[' + MARK + ']').forEach(function (b) {
+      b.hidden = !on; b.style.display = on ? '' : 'none';
+      if (b.textContent !== tx) b.textContent = tx;
+    });
   }
   function decorate() {
     document.querySelectorAll('[data-flixlegal="legal"]').forEach(function (legal) {
@@ -35,11 +40,13 @@
     sync();
   }
   window.addEventListener('flixprivacy', sync);
+  window.addEventListener('flixlang', sync);
   function startObserver() {
     decorate();
     var t = 0;
     new MutationObserver(function () { if (!t) t = setTimeout(function () { t = 0; decorate(); }, 60); })
       .observe(document.body, { childList: true, subtree: true });
+    new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   }
   if (document.body) startObserver(); else document.addEventListener('DOMContentLoaded', startObserver);
 })();

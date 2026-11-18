@@ -179,6 +179,12 @@ h2{margin:0;font-family:var(--disp);font-weight:400;font-size:30px;color:var(--y
 .toast{top:24%;font-size:20px;-webkit-text-stroke:5px var(--navy)}
 .note{font-size:12px;padding:5px 11px;background:rgba(11,42,92,.8);bottom:calc(env(safe-area-inset-bottom,0px) + 104px)}
 #settings .setcard{max-height:100%;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}#settings .setrow{flex-wrap:wrap}#settings .setrow>*{flex:1 1 40%}#restoreB2{width:100%}
+#settings .setrow>[data-flixprivacy]{order:3;flex-basis:100%}
+/* small phones (iPhone SE 1st gen, 320x568): the whole card incl. "Geri" fits without scrolling */
+@media (max-height:700px){#settings{padding-top:calc(env(safe-area-inset-top,0px) + 8px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
+#settings .setcard{padding:10px 12px;gap:6px}#settings h2{font-size:24px}#settings .set{gap:3px;font-size:13px}
+#settings .seg button{padding:5px 2px;font-size:12px;line-height:1.15}#settings .big{padding:7px 10px;font-size:16px;box-shadow:0 3px 0 var(--navy)}
+#settings #tiltNote{margin:-2px 0 2px;font-size:11px}}
 </style>
 </head>
 <body>

@@ -19,6 +19,8 @@
   let store = null; const pending = {}; const waiting = [];
   // products waiting for Ask to Buy approval: buy(id) answers 'pending' for them instead of ordering again
   const deferred = new Set();
+  // the player closed the Apple payment sheet: not an error, the game shows nothing
+  function isCancel(e) { const C = window.CdvPurchase && window.CdvPurchase.ErrorCode; return !!e && e.code === ((C && C.PAYMENT_CANCELLED) || 6777006); }
   function settle(id, ok) { if (pending[id]) { pending[id](ok); delete pending[id]; } }
   // Hands an approved purchase to the game (window.__flixGrant, once per transaction id) and only then lets it be finished.
   // A transaction that arrives before the game is ready waits; unfinished transactions come back on the next launch.
@@ -65,7 +67,7 @@
       .verified(r => r.finish())
       .productUpdated(() => { clearTimeout(priceTimer); priceTimer = setTimeout(() => window.dispatchEvent(new Event('flixprices')), 300); syncOwned(); })
       .receiptUpdated(syncOwned);
-    S.error(e => { console.warn('store error', e); for (const id in pending) settle(id, false); });
+    S.error(e => { console.warn('store error', e); for (const id in pending) settle(id, isCancel(e) ? 'cancelled' : false); });
     S.initialize([platform]);
     store = S;
   }
@@ -79,16 +81,17 @@
   }
 
   window.FlixNative = {
-    // resolves true (bought), false (cancelled / failed / store unavailable) or 'pending' (waiting for Ask to Buy approval)
+    // resolves true (bought), 'pending' (waiting for Ask to Buy approval), 'cancelled' (player closed the payment sheet),
+    // 'unavailable' (store not loaded / product not found, e.g. offline), 'busy' (this product's order is still open) or false (failed)
     buy(id) {
       return new Promise(res => {
         if (deferred.has(id)) return res('pending');
-        if (!store) return res(false);
+        if (!store) return res('unavailable');
         const prod = store.get(id), offer = prod && prod.getOffer();
-        if (!offer) return res(false);
-        if (pending[id]) return res(false);
+        if (!offer) return res('unavailable');
+        if (pending[id]) return res('busy');
         pending[id] = res;
-        offer.order().then(err => { if (err) settle(id, false); }, () => settle(id, false));
+        offer.order().then(err => { if (err) settle(id, isCancel(err) ? 'cancelled' : false); }, () => settle(id, false));
       });
     },
     // resolves with the restored non-consumable ids ([] when there is nothing to restore); rejects when the store can't be reached

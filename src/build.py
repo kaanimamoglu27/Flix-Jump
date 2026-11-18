@@ -8,8 +8,17 @@ fonts=''.join(f"@font-face{{font-family:{n};src:url(data:font/woff2;base64,{b64(
 # Declared after the base faces, so for characters in this range the browser tries the ext file first.
 EXT='U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF'
 fonts+=''.join(f"@font-face{{font-family:{n};src:url(data:font/woff2;base64,{b64(os.path.join(D,'fonts',f))}) format('woff2');font-weight:100 900;font-display:block;unicode-range:{EXT}}}\n" for n,f in [('Baloo','baloo_ext.woff2'),('Lucky','lucky_ext.woff2'),('PS','ps2p_ext.woff2'),('Cinzel','cinzel_ext.woff2')])
+import json
+def strx():
+    # levels_x.tsv: path<TAB>fr<TAB>de<TAB>ar -> appended to the [tr,en,es,zh] arrays of STR (order of LANGS)
+    X={}
+    for line in R('levels_x.tsv').splitlines():
+        if not line.strip() or line.startswith('# '): continue
+        c=line.split('\t'); X[c[0]]=c[1:4]
+    return ('const STR_X='+json.dumps(X,ensure_ascii=False)+';for(const p in STR_X){let o=STR;const k=p.split(\'.\');for(let i=0;i<k.length-1;i++)o=o[k[i]];if(o&&o[k[k.length-1]])o[k[k.length-1]].push(...STR_X[p]);}'
+            +'(function walk(v){if(Array.isArray(v)&&v.length===4&&v.every(x=>typeof x==="string"))v.push(v[1],v[1],v[1]);else if(v&&typeof v==="object")for(const k in v)walk(v[k]);})(STR);')
 s=R('index.src.html')
 s=s.replace('/*FONTS*/',fonts)
 s=s.replace('<script>/*LOGO*/</script>','<script>const LOGO="data:image/png;base64,'+b64(os.path.join(D,'logo.png'))+'";</script>')
-s=s.replace('/*AUDIO*/',R('audio_novahop.js')).replace('/*LEGAL*/',R('flix-legal.js')).replace('/*THEME_BASE*/',R('theme_base.js')+'\n'+R('theme_extra.js')).replace('/*LEVELS*/',R('levels.js')).replace('/*THEME*/',R('theme.js')).replace('/*GAME*/',R('game.js'))
+s=s.replace('/*AUDIO*/',R('audio_novahop.js')).replace('/*LEGAL*/',R('flix-legal.js')).replace('/*THEME_BASE*/',R('theme_base.js')+'\n'+R('theme_extra.js')).replace('/*LEVELS*/',R('levels.js')+'\n'+strx()).replace('/*THEME*/',R('theme.js')).replace('/*GAME*/',R('game.js'))
 out=os.path.join(D,'..','index.html');open(out,'w',encoding='utf-8').write(s);print(out,len(s))

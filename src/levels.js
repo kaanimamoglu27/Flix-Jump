@@ -25,7 +25,8 @@ const LEVELS=[
 window.LEVELS=LEVELS;
 const levelCost=n=>n<=1?0:5+n;          // Flix tüyü ile açılır
 const levelReward=n=>10+Math.floor(n/2)+(LEVELS[n-1].boss?5:0);
-const LANGS=['tr','en','es','zh'],LANG_NAME={tr:'Türkçe',en:'English',es:'Español',zh:'中文'};
+const LANGS=['tr','en','es','zh','fr','de','ar'],LANG_NAME={tr:'Türkçe',en:'English',es:'Español',zh:'中文',fr:'Français',de:'Deutsch',ar:'العربية'};
+// fr, de, ar come from levels_x.tsv (build.py appends them to every [tr,en,es,zh] array below)
 // [tr,en,es,zh]
 const STR={
  play:['OYNA','PLAY','JUGAR','开始'],shop:['Mağaza','Shop','Tienda','商店'],settings:['Ayarlar','Settings','Ajustes','设置'],levels:['Bölümler','Levels','Niveles','关卡'],
@@ -81,6 +82,12 @@ const STR={
  h1d:['Parmağını sağa sola kaydır','Slide your finger left and right','Desliza el dedo','左右滑动手指'],
  h2:['Ekrana dokun, Flix fırlat','Tap anywhere to throw a Flix','Toca la pantalla para lanzar un Flix','点击屏幕投掷Flix'],h2b:['Kötüleri vur ya da üstlerine zıpla.','Hit villains or stomp them from above.','Golpea a los villanos o písalos.','击中反派，或从上方踩扁。'],
  h3:['Tüy ve altın topla','Collect feathers and coins','Recoge plumas y monedas','收集羽毛和金币'],h3b:['Tüyle yeni bölüm açılır. 25 altın süper gücü doldurur.','Feathers open new levels. 25 coins charge your super.','Las plumas abren niveles. 25 monedas cargan el súper.','羽毛解锁新关卡，25金币充满超能力。'],
+ h4:['Her 5 bölümde bir patron','A boss every 5 levels','Un jefe cada 5 niveles','每5关一个头目'],
+ h4b:['5, 10, 15 ve 20. bölümlerde patron seni bekler: can çubuğu bitene kadar Flix fırlat. 5. bölümden sonra Sonsuz mod açılır.','A boss waits at levels 5, 10, 15 and 20: throw Flix until its health bar is empty. Endless mode opens after level 5.','En los niveles 5, 10, 15 y 20 te espera un jefe: lánzale Flix hasta vaciar su barra de vida. Tras el nivel 5 se abre el modo Infinito.','第5、10、15、20关有头目等你：不停投掷Flix直到它的血条清空。通过第5关后开启无尽模式。'],
+ h5:['Güçler','Power-ups','Poderes','道具'],
+ h5b:['🪶 Kanatlar seni yukarı taşır ve değdiğin kötüyü yener. 🛡 Kalkan bir darbeyi karşılar. Süper güç dolunca ona dokun: Flix yağmuru ekranı temizler.','🪶 Wings carry you up and defeat any villain you touch. 🛡 The shield takes one hit. When your super is charged, tap it: a rain of Flix clears the screen.','🪶 Las alas te elevan y vencen a los villanos que tocas. 🛡 El escudo aguanta un golpe. Cuando el súper esté cargado, tócalo: una lluvia de Flix limpia la pantalla.','🪶 翅膀带你上升并击败碰到的反派。🛡 护盾可挡一次攻击。超级技能充满后点击它：Flix雨清空屏幕。'],
+ h6:['Kontrol noktası ve reklamlar','Checkpoints and ads','Puntos de control y anuncios','检查点和广告'],
+ h6b:['Kontrol noktasını geçersen düştüğünde oradan devam edersin. Her oyunda bir kez isteğe bağlı reklamla devam edebilir, bölüm sonunda reklamla ödülünü ikiye katlayabilirsin. Reklamsız oyna paketi oyun arası reklamları kapatır.','Pass a checkpoint and you restart there if you fall. Once per run an optional ad lets you continue, and at the end of a level it can double your reward. The Remove ads pack turns off the ads between runs.','Si pasas un punto de control, al caer sigues desde ahí. Una vez por partida un anuncio opcional te deja continuar, y al final del nivel duplica tu premio. El pack Sin anuncios quita los anuncios entre partidas.','通过检查点后，掉落会从那里继续。每局可通过一次可选广告继续，关卡结束时可用广告让奖励翻倍。“去除广告”礼包会关闭局间广告。'],
  gotIt:['Anladım','Got it','Entendido','知道了'],adTest:['Reklam (test)','Ad (test)','Anuncio (prueba)','广告（测试）'],
  L:[['Ekran Şehri','Screen City','Ciudad Pantalla','屏幕之城'],['Yaylı Çatılar','Spring Rooftops','Azoteas con Muelles','弹簧屋顶'],['Rüzgarlı Tepe','Windy Hill','Colina Ventosa','大风山丘'],['Cam Kule','Glass Tower','Torre de Cristal','玻璃塔'],['Kralın Tahtı','The King\'s Throne','El Trono del Rey','王座'],
   ['Buz Vadisi','Ice Valley','Valle de Hielo','冰谷'],['Bulut Yolu','Cloud Road','Camino de Nubes','云之路'],['Oyuncak Fabrikası','Toy Factory','Fábrica de Juguetes','玩具工厂'],['Sisli Orman','Foggy Forest','Bosque de Niebla','迷雾森林'],['Ejderha Yuvası','Dragon\'s Nest','Nido del Dragón','龙巢'],
